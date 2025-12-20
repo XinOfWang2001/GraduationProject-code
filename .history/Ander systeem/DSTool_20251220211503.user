@@ -1,0 +1,32 @@
+[
+  {
+    "Name": "DevStartup",
+    "Projects": [
+      {
+        "Path": "DSTool\\DSTool.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "DSAPI\\DSAPI.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      }
+    ]
+  },
+  {
+    "Name": "API en Blazor startup",
+    "Projects": [
+      {
+        "Path": "DSTool\\DSTool.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "DSAPI\\DSAPI.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      }
+    ]
+  }
+]
