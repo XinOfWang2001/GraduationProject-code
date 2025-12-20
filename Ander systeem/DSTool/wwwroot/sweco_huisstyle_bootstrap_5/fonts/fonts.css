@@ -1,0 +1,37 @@
+/* Sweco Sans v.1.6.0 */
+
+/* Sweco Sans Regular */
+@font-face {
+  font-family: 'Sweco Sans';
+  src: url('SwecoSans-Regular.eot');
+  src: url('SwecoSans-Regular.eot?#iefix') format('embedded-opentype'),
+       url('SwecoSans-Regular.woff2') format('woff2'),
+       url('SwecoSans-Regular.woff') format('woff'),
+       url('SwecoSans-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Sweco Sans Medium */
+@font-face {
+  font-family: 'Sweco Sans Medium';
+  src: url('SwecoSans-Medium.eot');
+  src: url('SwecoSans-Medium.eot?#iefix') format('embedded-opentype'),
+       url('SwecoSans-Medium.woff2') format('woff2'),
+       url('SwecoSans-Medium.woff') format('woff'),
+       url('SwecoSans-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Sweco Sans Bold */
+@font-face {
+  font-family: 'Sweco Sans Bold';
+  src: url('SwecoSans-Bold.eot');
+  src: url('SwecoSans-Bold.eot?#iefix') format('embedded-opentype'),
+       url('SwecoSans-Bold.woff2') format('woff2'),
+       url('SwecoSans-Bold.woff') format('woff'),
+       url('SwecoSans-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}

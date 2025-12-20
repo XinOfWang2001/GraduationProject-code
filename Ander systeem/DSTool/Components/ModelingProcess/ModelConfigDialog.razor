@@ -1,0 +1,179 @@
+﻿@inject IWorkspaceManager Manager
+@inject IModelService ModelProxyService 
+@inject IAlgorithmComponentBuilder AlgorithmBuilder
+@inject IServiceProvider ServiceProvider
+
+@using Leap.ApplicationServices.DTO
+@using Leap.ApplicationServices.DTO.ModelDTO
+@using Leap.ApplicationServices.Interfaces.ClientServerProxy
+@using Leap.ApplicationServices.Interfaces.Strategies
+@using Leap.Domain.Domain.ModelConfig.Enums
+@using LeapDataScienceTool.Common.Services
+@using LeapDataScienceTool.Common.Énums
+@using LeapDataScienceTool.Common
+@using LeapDataScienceTool.Common.Components.Input
+@using LeapDataScienceTool.Components.ModelingProcess.ModelAlgorithms
+@using LeapDataScienceTool.PageManagers
+@using LeapDataScienceTool.Common.Components
+@using LeapDataScienceTool.Services
+
+<MudDialog>
+	<TitleContent>
+		<MudText Typo="Typo.h6">
+			Modelconfiguratie
+		</MudText>
+	</TitleContent>
+	<DialogContent>
+		<MudForm @ref="form" @bind-IsValid="@Success" @bind-Errors="@errors">
+			<MudItem class="container-fluid">
+				<ErrorMessage Message="@ErrorMessage"></ErrorMessage>
+				<MudTextField @bind-value="modelConfig.ModelName" Required Label="Geef dit model een naam:" Placeholder="Voer modelnaam in" />
+
+				<MudDatePicker @bind-Date=@modelConfig.ForecastingDate Label="Optioneel: Selecteer datum waarvoor testdata voorspelt wordt."></MudDatePicker>
+
+				<MudField Label="Percentage trainingsdata: ">
+					<MudSlider id="slider_data_split" @bind-Value="modelConfig.DataSplitRatio" T="float" Min="0.1f" Max="0.8f" Step="0.01f">@((int)(modelConfig.DataSplitRatio * 100))</MudSlider>
+				</MudField>
+
+				<MudGrid>
+					<MudItem xs="6">
+						<MultiDropdownComponent Required="false" T="DataColumnDTO" SelectedItems="modelConfig.Features" Collection="Manager.GetColumns()" CallbackMethod="(IEnumerable<DataColumnDTO> collection) => SelectFeatures(collection)" Label="Selecteer trainingskolommen" />
+					</MudItem>
+					<MudItem xs="6">
+						<MultiDropdownComponent Required="false" T="DataColumnDTO" SelectedItems="modelConfig.Targets" Collection="Manager.GetColumns()" CallbackMethod="(IEnumerable<DataColumnDTO> collection) => SelectTargets(collection)" Label="Selecteer voorspelkolommen" />
+					</MudItem>
+				</MudGrid>
+
+				<MudDivider Class="m-1" DividerType="DividerType.Middle" />
+				<MudSelect @bind-Value="modelConfig.ModelType" Label="Selecteer het modeltype">
+					@foreach (var type in Enum.GetValues(typeof(ModelType)).Cast<ModelType>())
+					{
+						// Temp: statements
+						if (type != ModelType.OUTLIER_DETECTION)
+						{
+							<MudSelectItem Value="@type">@type.ToString().ToLowerInvariant()</MudSelectItem>
+						}
+					}
+				</MudSelect>
+				<MudSelect @bind-Value="modelConfig.DateTimeLevel" Label="Selecteer datumniveau waarop getraind wordt">
+					@foreach (var type in Enum.GetValues(typeof(DateTimeLevel)).Cast<DateTimeLevel>())
+					{
+						<MudSelectItem Value="@type">@type.GetDescription()</MudSelectItem>
+					}
+				</MudSelect>
+				<MudSelect Value="modelConfig.ModelAlgorithm" Label="Selecteer het type model algoritme" ValueChanged="((ModelAlgorithm input) => SelectModelAlgorithm(input))">
+					@foreach (var type in Enum.GetValues(typeof(ModelAlgorithm)).Cast<ModelAlgorithm>())
+					{
+						if (type != ModelAlgorithm.NONE)
+						{
+							<MudSelectItem Value="@type">@type.ToString().ToLowerInvariant()</MudSelectItem>
+						}
+					}
+				</MudSelect>
+
+				<!-- Hier dynamische formulier -->
+				@if (AdvancedParameters != null)
+				{
+					@AdvancedParameters
+				}
+			</MudItem>
+		</MudForm>
+		
+	</DialogContent>
+	<DialogActions>
+		<MudButton Color="Color.Default" OnClick="Cancel">Annuleer</MudButton>
+		<LoadingButton ButtonName="Bevestig" ButtonColor="Color.Success" TriggerMethod="Confirm" ExternalCondition=(!Success)></LoadingButton>
+	</DialogActions>
+</MudDialog>
+
+
+@code {
+	[Parameter]
+	public required ModelConfigDTO modelConfig { get; set; }
+
+	[Parameter]
+	public DataProcesState State { get; set; } = DataProcesState.CONCEPT;
+
+	[CascadingParameter]
+	public required IMudDialogInstance MudDialog { get; set; }
+
+	public RenderFragment? AdvancedParameters { get; set; }
+	public required MudForm form { get; set; }
+	public bool Success;
+	private string[] errors = { };
+	public string ErrorMessage { get; set; } = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		var config = await ModelProxyService.GetModelConfig(modelConfig.ModelConfigGuid);
+		if (config != null)
+		{
+			State = DataProcesState.SET;
+		}
+		LoadAdvancedComponent(modelConfig.ModelAlgorithm);
+	}
+
+	public void SelectFeatures(IEnumerable<DataColumnDTO> dataColumns)
+	{
+		modelConfig.Features = dataColumns;
+	}
+
+	public void SelectTargets(IEnumerable<DataColumnDTO> dataColumns)
+	{
+		modelConfig.Targets = dataColumns;
+	}
+
+	public void SelectModelAlgorithm(ModelAlgorithm algorithm)
+	{
+		modelConfig.ModelAlgorithm = algorithm;
+		// Select Algorithm parameters.
+		SelectAlgorithmParameters(algorithm);
+	}
+
+	private void SelectAlgorithmParameters(ModelAlgorithm algorithm)
+	{
+		try
+		{
+			var service = ServiceProvider.GetRequiredKeyedService<IAlgorithmCreationStrategy>(algorithm);
+			modelConfig.AlgorithmParameterDTO = service.BuildAlgorithmDTO();
+			LoadAdvancedComponent(algorithm);
+			Console.WriteLine("Algorithm selected");
+		}
+		catch
+		{
+			AdvancedParameters = null;
+		}
+	}
+
+	private void LoadAdvancedComponent(ModelAlgorithm algorithm)
+	{
+		AdvancedParameters = AlgorithmBuilder.BuildAlgorithmComponent(modelConfig);
+		StateHasChanged();
+	}
+
+	public async Task Confirm()
+	{
+		// Decide if the request should be a POST or PUT Request.
+		var result = await PushChanges();
+		if(result == null)
+		{
+			// Show error message or something.
+			ErrorMessage = "Er was iets misgegaan met het verzenden van het verzoek.";
+			return;
+		}
+		// Use proxy service to post DTO.
+		MudDialog.Close(DialogResult.Ok(modelConfig));
+	}
+
+	private async Task<ModelConfigDTO?> PushChanges()
+	{
+		if (State.Equals(DataProcesState.CONCEPT))
+		{
+			return await ModelProxyService.RegisterModelConfig(modelConfig);
+		}
+
+		return await ModelProxyService.UpdateModelConfig(modelConfig.ModelConfigGuid, modelConfig);
+	}
+
+	private void Cancel() => MudDialog.Cancel();
+}

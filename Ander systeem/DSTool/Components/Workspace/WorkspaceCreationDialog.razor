@@ -1,0 +1,63 @@
+﻿@using Leap.ApplicationServices.DTO.DataProcessDTO
+@using Leap.ApplicationServices.DTO.Workspace
+@using Leap.ApplicationServices.Interfaces.ClientServerProxy
+@using LeapDataScienceTool.Common.Components.Input
+
+@inject IWorkspaceService workspaceService
+@inject NavigationManager NavigationManager
+
+<MudDialog Class="container">
+    <TitleContent>
+        <MudText Typo="Typo.h5">Maak een werkruimte aan</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>@Error</MudText>
+        <MudForm @ref="form" @bind-IsValid="@Success" @bind-Errors="@errors">
+            <MudTextField Required=true Label="Wijs een naam toe" @bind-Value="@workspaceConfig.WorkspaceName"/>
+        </MudForm>
+        
+    </DialogContent>
+    <DialogActions>
+        <MudButton class="delete_color" OnClick="Cancel">Annuleer</MudButton>
+        <LoadingButton CSSTags="add_color" ExternalCondition=@(!Success) TriggerMethod="Confirm" ButtonName="Aanmaken"></LoadingButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public IMudDialogInstance DialogInstance { get; set; }
+    [Parameter]
+    public required WorkspaceConfigDTO workspaceConfig {get; set;}
+    public string Error { get; set; } = string.Empty;
+
+    public MudForm form { get; set; }
+    private string[] errors = { };
+    private bool Success;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Yield(); 
+        await form.Validate();
+    }
+
+    private async Task<WorkspaceConfigDTO?> CreateWorkspace()
+    {
+        return await workspaceService.RegisterWorkspace(workspaceConfig);
+    }
+
+    private void Cancel() => DialogInstance.Cancel();
+
+    public async Task Confirm()
+    {
+        // Try creating a workspace.
+        var success = await CreateWorkspace();
+        if(success == null)
+        {
+            Error = "Opslaan is mislukt";
+            return;
+        }
+        DialogInstance.Close(DialogResult.Ok(true));
+        NavigationManager.NavigateTo($"/workspace/{success.WorkspaceGuid}", true);
+
+    }
+}

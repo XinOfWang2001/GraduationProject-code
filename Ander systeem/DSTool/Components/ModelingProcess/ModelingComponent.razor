@@ -1,0 +1,133 @@
+﻿@using Leap.ApplicationServices.DTO.ModelDTO
+@using Leap.Domain.Domain.ModelConfig.Enums
+@using LeapDataScienceTool.Common.Components
+@using LeapDataScienceTool.Common.Services
+@using LeapDataScienceTool.PageManagers
+@using LeapDataScienceTool.Common.Abstractions
+
+@inject IDialogService DialogService
+@inject IWorkspaceManager Manager 
+@inject ResponseService responseService
+@inherits SynchronizerComponent
+
+<MudItem Class="rounded pa-2 flex-grow-1 justify-content-center mud-elevation" style="min-height:12em">
+	<div class="card m-1 mud-elevation-5">
+		<div class="card-body">
+			<h5 class="card-title">@ModelComponentTitle</h5>
+			<ErrorMessage Message="@ModelConfigWarning"></ErrorMessage>
+			@if(modelConfig != null)
+			{
+				<MudButton OnClick="OpenForm" Class="edit_color">Configureer</MudButton>
+			}
+		</div>
+	</div>
+</MudItem>
+
+@code {
+
+	// It will receive from the manager an DTO that might be nullable.
+	// The retrieval of ModelConfig is currently done via the parent component and might be nullable.
+	// Changes to do this process, will need require changes in WorkspaceManager.
+	public ModelConfigDTO? modelConfig { get; set; }
+
+	// UI-Related attributes.
+	private string ModelComponentTitle { get; set; } = "Configureer model parameters";
+	private string TypeOfModel { get; set; } = string.Empty;
+
+	public string ModelConfigWarning { get; set; } = string.Empty;
+
+	// Load model config in this component.
+	protected override void OnInitialized()
+	{
+		modelConfig = Manager.GetModelConfig();
+		// If not yet assigned.
+		if (modelConfig == null)
+		{
+			modelConfig = new ModelConfigDTO(){ ParentWorkspaceGuid = Manager.GetWorkspaceConfigDTO().WorkspaceGuid };
+			ModelComponentTitle = "Configureer model parameters";
+		}
+		else
+		{
+			RunValidityChecks();
+			LoadText();
+		}
+	}
+
+	public override void Synchronize(EventArgs args)
+	{
+		if (modelConfig == null) return;
+
+		var dataSourceEvent = (DataSourceEventArgs)args;
+		Console.WriteLine("Synchronisatie");
+		// Trigger dit alleen als er een kolom verwijdert is.
+		if ((dataSourceEvent.TargetChanges > 0) || (dataSourceEvent.FeatureChanges > 0))
+		{
+			ModelConfigWarning = "Stel nieuwe waarden in";
+			responseService.ShowInfoResponse("De beschikbare kolommen zijn gewijzigd. Voer nieuwe model gegevens in.");
+		}
+		StateHasChanged();
+	}
+
+	private void RunValidityChecks()
+	{
+		if (!CheckValidityFeatures())
+		{
+			ModelConfigWarning = "Gekozen feature variabelen zijn invalide. Wijzig deze gegevens graag.";
+			// responseService.ShowErrorResponse("Gekozen kolommen zijn niet geldig.");
+		}
+	}
+
+	private bool CheckValidityFeatures()
+	{
+		Console.WriteLine("Check validity of Model component if columns are still valid");
+		// Always return true, because it should not raise an error if the 
+		var currentColumns = Manager.GetColumns();
+		var hashColumnId = currentColumns.ToHashSet();
+		var hashCurrentColumns = modelConfig?.Features.ToHashSet();
+		return hashCurrentColumns == null || hashCurrentColumns.All(id => hashColumnId.Contains(id));
+	}
+
+	private void LoadText()
+	{
+		if (modelConfig != null)
+		{
+			ModelComponentTitle = modelConfig.ModelName;
+			TypeOfModel = modelConfig.ModelType.ToString().ToLower();
+		}
+		else
+		{
+			ModelComponentTitle = "Configureer model parameters";
+		}
+	}
+
+	// Open dialogbox
+	public async Task OpenForm()
+	{
+		DialogOptions dialogOptions = GetDialogOptions();
+		DialogParameters<ModelConfigDialog> parameters = GetDialogParameters(modelConfig);
+		IDialogReference result = await DialogService.ShowAsync<ModelConfigDialog>("Custom config", parameters, dialogOptions);
+		ModelConfigDTO? config = await result.GetReturnValueAsync<ModelConfigDTO>();
+		if(config != null)
+		{
+			// Overwrite ViewModel on UI side. P.S. This class will not send the POST request to the API.
+			Manager.UpdateModelConfig(config);
+			ModelConfigWarning = string.Empty;
+			responseService.ShowSuccessfullResponse("Model is succesvol gewijzigd.");
+			modelConfig = config;
+			LoadText();
+		}
+	}
+
+	private DialogOptions GetDialogOptions()
+	{
+		return new() { Position = DialogPosition.TopCenter, CloseButton = false, MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true, BackdropClick = false };
+	}
+
+	private DialogParameters<ModelConfigDialog> GetDialogParameters(ModelConfigDTO? config)
+	{
+		return new DialogParameters<ModelConfigDialog>
+		{
+			{ extractInputClass => extractInputClass.modelConfig, config }
+		};
+	}
+}

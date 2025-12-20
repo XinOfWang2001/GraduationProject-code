@@ -1,0 +1,16 @@
+@using ScottPlot
+@using ScottPlot.Blazor
+
+<MudText Typo="Typo.h5">Dummy forecast <MudChip T="string" Color="MudBlazor.Color.Info">Demo</MudChip></MudText>
+
+<BlazorPlot @ref="BlazorPlot" Style="width: 400px; height: 300px;" />
+
+@code{
+	BlazorPlot BlazorPlot { get; set; } = new();
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		BlazorPlot.Plot.Add.Signal(Generate.Sin());
+		BlazorPlot.Plot.Add.Signal(Generate.Cos());
+	}
+}

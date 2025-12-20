@@ -1,0 +1,66 @@
+{
+  "PredictionSet": {
+    "Timestamps": [
+      "2025-08-24T00:00:00+00:00",
+      "2025-08-24T12:00:00+00:00"
+    ],
+    "Values": {
+      "X_1-predicted": [ 9.1, 12.5 ],
+      "X_2-predicted": [ 35.1, 38.5 ]
+    },
+    "ColumnNames": [ "X_1-predicted", "X_2-predicted" ]
+  },
+  "DataColumns": [
+    {
+      "ColumnName": "timestamp",
+      "DataType": "datetime[μs, UTC]"
+    },
+    {
+      "ColumnName": "X_1",
+      "DataType": "f64"
+    },
+    {
+      "ColumnName": "X_2",
+      "DataType": "f64"
+    }
+  ],
+  "DataCount": 26,
+  "MetricsKeyValue": {
+    "RMSE": [
+      {
+        "Column": "X_1",
+        "Metric": "RMSE",
+        "Value": 0.07111592694397174
+      },
+
+      {
+        "Column": "X_2",
+        "Metric": "RMSE",
+        "Value": 0.03502505616580881
+      }
+    ],
+    "MAPE (%)": [
+      {
+        "Column": "X_2",
+        "Metric": "MAPE",
+        "Value": 0.15943820673146902
+      },
+      {
+        "Column": "X_1",
+        "Metric": "MAPE",
+        "Value": 0.1051064727832597
+      }
+    ]
+  },
+  "DataSet": {
+    "Timestamps": [
+      "2025-08-23T04:00:00+00:00",
+      "2025-08-23T16:00:00+00:00"
+    ],
+    "Values": {
+      "X_1": [ 15.1, 18.5 ],
+      "X_2": [ 25.1, 28.5 ]
+    },
+    "ColumnNames": [ "X_1", "X_2" ]
+  }
+}

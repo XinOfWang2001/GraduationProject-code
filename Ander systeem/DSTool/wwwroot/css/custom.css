@@ -1,0 +1,33 @@
+﻿.edit_color {
+    background-color: #232F34 !important;
+    color: white !important;
+}
+
+.delete_color {
+    background-color: #DE7602 !important;
+    color: black !important;
+}
+
+.add_color {
+    background-color: #2F6F89 !important;
+    color: white !important;
+}
+
+.action_color {
+    background-color: #2F6F89 !important;
+    color: white !important;
+}
+
+.action_color2 {
+    background-color: #5E4830 !important;
+    color: white !important;
+}
+
+.min-height-dialog {
+    min-height: 5em;
+}
+
+.timeseries_graph {
+    width: 100%;
+    height: 34em;
+}

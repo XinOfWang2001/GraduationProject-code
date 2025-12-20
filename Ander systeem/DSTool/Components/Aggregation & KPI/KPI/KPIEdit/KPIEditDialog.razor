@@ -1,0 +1,31 @@
+﻿@using Leap.ApplicationServices.DTO
+@inject IDialogService DialogService
+
+<MudDialog>
+	<TitleContent>
+		<MudText Typo="Typo.h4">
+			Dynamische KPI instellingen <MudChip T="string" Color="Color.Primary">(WIP)</MudChip>
+		</MudText>
+	</TitleContent>
+	<DialogContent>
+		<!-- Drop container with only one element -->
+		<KPIDropContainer>
+
+		</KPIDropContainer>
+	</DialogContent>
+	<DialogActions>
+		<MudButton Color="Color.Default" OnClick="Close">Annuleer</MudButton>
+		<MudButton id="Confirm" Color="Color.Success" OnClick="Close">Bevestig</MudButton>
+	</DialogActions>
+</MudDialog>
+
+
+@code {
+	[CascadingParameter]
+	public required IMudDialogInstance MudDialog { get; set; }
+
+	private void Close()
+	{
+		MudDialog.Cancel();
+	}
+}

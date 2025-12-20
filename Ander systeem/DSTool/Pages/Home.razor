@@ -1,0 +1,28 @@
+﻿@page "/"
+@using ScottPlot
+@using ScottPlot.Blazor
+
+@using LeapDataScienceTool.Common.Components.Visualisations
+@using LeapDataScienceTool.Common.Components.Input
+
+<PageTitle>Home</PageTitle>
+
+<MudGrid>
+	<MudItem xs="12">
+		<h1>Leap Data science tool</h1>
+		<MudText>
+			Dit is een demonstratie applicatie.
+		</MudText>
+		<MudItem class="d-flex justify-content-center">
+			<NavLink xs="3" class="btn add_color" href="workspace">Probeer het uit.</NavLink>
+		</MudItem>
+	</MudItem>
+	
+	@for (int i = 0; i < 10; i++)
+	{
+		<MudItem xs="5">
+			<DummyGraph></DummyGraph>
+		</MudItem>
+		
+	}
+</MudGrid>

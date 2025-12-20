@@ -1,0 +1,51 @@
+﻿@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@inject IWebAssemblyHostEnvironment Env
+
+<MudLayout>
+    <MudAppBar Color="Color.Dark" Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <MudText>Leap Data Science</MudText>
+
+        @if (Env.IsDevelopment() || Env.IsStaging())
+        {
+            <MudSpacer />
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Filled">Dit is een testomgeving. Gebruik deze versie om dingen uit te proberen.</MudAlert>
+            <MudSpacer />
+        }
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Rounded.Person" Color="Color.Inherit" Href="#" Target="_blank" />
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_open" Elevation="1">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">Leap Data Science</MudText>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="/" Match="NavLinkMatch.All">Home</MudNavLink>
+            <MudNavLink Href="workspace" Match="NavLinkMatch.All">Workspaces</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+    <MudMainContent>
+        <main class="container">
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
+    </MudMainContent>
+</MudLayout>
+@code {
+
+    [Parameter]
+    public required RenderFragment Body { get; set; }
+    private bool _open = false;
+    private bool _hideTitle = false;
+
+    private void ToggleDrawer()
+    {
+        _open = !_open;
+
+        if (_open)
+        {
+            _hideTitle = !_hideTitle;
+        }
+    }
+}

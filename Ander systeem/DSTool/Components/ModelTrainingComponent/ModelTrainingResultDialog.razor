@@ -1,0 +1,126 @@
+﻿@using Leap.ApplicationServices.DTO.DataResult
+@using Leap.ApplicationServices.DTO.External_Services
+@using Leap.ApplicationServices.DTO.ModelingProcess
+@using Leap.ApplicationServices.Interfaces.ClientServerProxy
+@using LeapDataScienceTool.Common.Components.Visualisations
+@using LeapDataScienceTool.PageManagers
+
+@inject IWorkspaceManager Manager
+@inject IModelOperationService ModelOperationProxyService 
+
+<MudDialog>
+	<TitleContent>
+		<MudText Typo="Typo.h3">Model trainingsoverzicht</MudText>
+	</TitleContent>
+	<DialogContent>
+		<div class="container">
+			@if (Result != null)
+			{
+				<MudAlert Variant="Variant.Filled" Severity="Severity.Success" ShowCloseIcon="true">@SuccesfullText</MudAlert>
+				<MudGrid>
+					<!--Grafiek-->
+					<MudItem xs="12">
+						<ForecastingLineGraph ForecastData="Result.PredictionSet" OriginalData="Result.DataSet"></ForecastingLineGraph>
+					</MudItem>
+					<!--Metrieken-->
+					<MudItem xs="8">
+						<MudText Typo="Typo.h4">Model evaluatie</MudText>
+						<MudDivider />
+						<MudGrid>
+							@foreach (var metricKeys in Result.MetricsKeyValue.Keys)
+							{
+								<MudItem xs="6">
+									<MudText Typo="Typo.h5">@metricKeys</MudText>
+									@foreach (var metric in Result.MetricsKeyValue[metricKeys])
+									{
+										<ModelMetricLabel Metric="@metric.Column" Value="@metric.Value"></ModelMetricLabel>
+									}
+								</MudItem>
+							}
+						</MudGrid>
+					</MudItem>
+
+					<!--Legenda-->
+					<MudItem xs="4">						
+						<MetricHelpComponent></MetricHelpComponent>
+					</MudItem>
+				</MudGrid>
+			}
+			else
+			{
+
+				<MudAlert Variant="Variant.Filled" Severity="Severity.Warning">@SuccesfullText</MudAlert>
+			}
+			@if (Loading)
+			{
+				<div class="container min-height-dialog">
+					<MudProgressCircular Color="Color.Default" Indeterminate="true" />
+				</div>
+			}
+		</div>
+	</DialogContent>
+	<DialogActions>
+		@if (!Loading)
+		{
+			<MudButton Class="action_color ms-1" OnClick="Close">Afsluiten</MudButton>
+		}
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	public required IMudDialogInstance MudDialog { get; set; }
+	public string SuccesfullText { get; set; } = "Loading";
+	public ModelResultDataDTO? Result { get; set; }
+
+	private bool Loading = true;
+
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			ModelTrainingRequestDTO requestDTO = CreateRequest();
+			var result = await ModelOperationProxyService.TriggerModelTraining(requestDTO);
+			if (result == null)
+			{
+				SuccesfullText = "Er was iets misgegaan met het modeltrainen. Neem contact op met de ontwikkelaars van deze tool en probeer het later nog eens.";
+			}
+			else
+			{
+				SuccesfullText = "Modeltraining is succesvol verlopen.";
+				Result = result;
+			}
+		}
+		catch
+		{
+			SuccesfullText = "Databron configuratie of Modelconfiguratie moeten nog ingesteld worden.";
+		}
+		Loading = !Loading;
+		await base.OnInitializedAsync();
+	}
+
+	public void Close()
+	{
+		MudDialog.Cancel();	
+	}
+
+	private ModelTrainingRequestDTO CreateRequest()
+	{
+		var WorkspaceData = Manager.GetWorkspaceConfigDTO();
+		var DataExtractData = Manager.GetDataExtractConfigDTO();
+		var ModelConfigData = Manager.GetModelConfig();
+		// Combine data into one
+		return new ModelTrainingRequestDTO()
+			{
+				DataExtractConfigGuid = DataExtractData.ProcessId,
+				WorkspaceGuid = WorkspaceData.WorkspaceGuid,
+				ModelConfigGuid = ModelConfigData.ModelConfigGuid
+			};
+	}
+}

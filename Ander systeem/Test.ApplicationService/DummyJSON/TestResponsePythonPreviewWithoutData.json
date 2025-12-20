@@ -1,0 +1,26 @@
+{
+    "DataColumns": [
+        {
+            "ColumnName": "timestamp",
+            "DataType": "datetime[μs, UTC]"
+        },
+        {
+            "ColumnName": "K2_mm",
+            "DataType": "f64"
+        },
+      {
+        "ColumnName": "K3_mm",
+        "DataType": "f64"
+      },
+      {
+        "ColumnName": "K4_mm",
+        "DataType": "f64"
+      },
+      {
+        "ColumnName": "K5_mm",
+        "DataType": "f64"
+      }
+    ],
+    "DataCount": 10,
+    "DataSet": []
+}

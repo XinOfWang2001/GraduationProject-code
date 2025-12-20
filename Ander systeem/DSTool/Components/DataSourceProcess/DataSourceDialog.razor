@@ -1,0 +1,263 @@
+﻿@using Leap.ApplicationServices.DTO
+@using Leap.ApplicationServices.DTO.DataConfig
+@using Leap.ApplicationServices.DTO.DataProcessDTO
+@using Leap.ApplicationServices.DTO.External_Services
+@using Leap.ApplicationServices.Interfaces.ClientServerProxy
+@using Leap.Domain.Domain.DataConfig;
+@using LeapDataScienceTool.Common.Components
+@using LeapDataScienceTool.Common.Components.Input
+@using LeapDataScienceTool.Common.Énums
+@using LeapDataScienceTool.Components.DataSourceProcess.MonitorInfoTable
+
+@inject IDataSourceService dataSourceService 
+@inject IDataExtractService DataExtractProcessService
+@inject IMonitorDataService monitorDataService 
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h4">
+            Databron-instelling
+        </MudText>
+
+    </TitleContent>
+    <DialogContent>
+        @if (HasLoaded)
+        {
+            <ErrorMessage Message=@ExceptionMessage></ErrorMessage>
+            <!-- The formulier content. -->
+            <MudForm @ref="form" @bind-IsValid="@Success" @bind-Errors="@errors">
+                <MudGrid>
+                    <MudItem xs="12" Class="ms-3 mt-2">
+                        <!-- Extra datasource field. -->
+                        <MudSelect Required="true" Value="@DataConfig.DataSource" Label="Kies een databron" Clearable ValueChanged="@(async (DataSourceDTO dataSource)=> await OnDataSourceSelection(dataSource))">
+                            @foreach (var dataSource in DataSources)
+                            {
+                                <MudSelectItem Value="@dataSource">@dataSource.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <!-- Load project dto if datasource exists in config or is selected-->
+                    @if (DataConfig.DataSource != null)
+                    {
+                        <MudItem xs="12" Class="ms-3 mt-2">
+                            <!-- Een dropdown box-->
+                            <MudSelect Required="true" Value="@DataConfig.ProjectDTO" Label="Kies projectdata" Clearable ValueChanged="@(async (ProjectSourceDTO args) => await OnProjectSelection(args))">
+                                @foreach (var project in Projects)
+                                {
+                                    <MudSelectItem Value="@project">@project.HumanReadableName</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                    }
+                    <!--Sensors should be loaded in, based on the project-->
+                    @if (DataConfig.ProjectDTO != null)
+                    {
+                        <MudItem xs="6">
+                            <MultiDropdownComponent Required="true" Collection=Sensors SelectedItems=DataConfig.SensorsSelected Label="Selecteer sensoren" CallbackMethod="(IEnumerable<SensorDTO> collection) => OnSensorSelection(collection)">
+                            </MultiDropdownComponent>
+                            <MudSelect SelectAll="true" Label="Selecteer waardetypen" Required="true" Class="ms-3 mt-2" @bind-SelectedValues=DataConfig.ValueTypesSelected Clearable MultiSelection="true">
+                                @foreach (var vt in ValueTypes)
+                                {
+                                    <MudSelectItem Value="@vt">(Id: @vt.Id) @vt.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                            
+                            <MudDatePicker IsDateDisabledFunc="((data) => data.Date.AddDays(1) > DataConfig.EndDate)" Required="true" Class="ms-3 mt-2" Label="Selecteer begindatum" @bind-Date=@DataConfig.StartDate></MudDatePicker>
+                            <MudDatePicker IsDateDisabledFunc="((data) => data.Date > DateTime.Now)" Required="true" Class="ms-3 mt-2" Label="Selecteer einddatum" @bind-Date=@DataConfig.EndDate></MudDatePicker>
+                            <MudNumericField @bind-Value=DataConfig.AmountOfData Min=-1 Max=100000 Label="Voer hier de hoeveelheid data dat opgehaald kan worden. Voer -1 voor maximale hoeveelheid data" Class="ms-3 mt-2"></MudNumericField>
+
+                            @if(DataConfig.AmountOfData == -1)
+                            {
+                                <MudSelect Required="true" @bind-Value=DataConfig.TimeLevelDTO Label="Selecteer het tijdsniveau waarvoor data opgehaald wordt. (Alleen als hoeveelheid data op -1 gezet wordt)" Class="ms-3 mt-2">
+                                    @foreach (var tn in TimeLevels)
+                                    {
+                                        <MudSelectItem Value="tn">@tn.TimelevelName</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            }
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudContainer Class="overflow-auto">
+                                <MonitorInfoTable monitorInfoDTO="@monitorInfo"></MonitorInfoTable>
+                            </MudContainer>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </MudForm>
+        }
+        else
+        {
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="Cancel">Annuleer</MudButton>
+        <LoadingButton ButtonColor="Color.Success" ExternalCondition=(!Success) TriggerMethod="Confirm" ButtonName="Bevestig"></LoadingButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+
+    [Parameter]
+    public required DataExtractProcess DataExtractProcess { get; set; }
+    public required DataProcesState Status { get; set; } = DataProcesState.CONCEPT;
+    private DataExtractConfigDTO DataConfig { get; set; }
+    public required MudForm form { get; set; }
+    private string[] errors = { };
+    public bool Success;
+    private bool HasError { get; set; } = false;
+
+    // Used for selection fields
+    private IEnumerable<DataSourceDTO> DataSources { get; set; } = [];
+    public List<ProjectSourceDTO> Projects { get; set; } = new();
+    public List<SensorDTO> Sensors { get; set; } = new();
+    public List<ValueTypeDTO> ValueTypes { get; set; } = new();
+    public List<TimeLevelDTO> TimeLevels { get; set; } = [];
+    public MonitorInfoDTO monitorInfo { get; set; } = new();
+    private bool HasLoaded { get; set; } = false;
+    private Dictionary<int, int[]> SensorVTCombination = new();
+
+    [CascadingParameter]
+    public required IMudDialogInstance MudDialog { get; set; }
+
+    public string ExceptionMessage { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        DataConfig = DataExtractProcess.DataProcess;
+        Status = DataExtractProcess.Status;
+        // Check if config already exists
+        // Load specific projects
+        await LoadDataSources();
+        if (DataConfig != null)
+        {
+            await LoadProjects();
+            await LoadMonitorInfoIn();
+            // Load correctvaluetypes in.
+            OnSensorSelection(DataConfig.SensorsSelected);
+        }
+        HasLoaded = true;
+        await base.OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private async Task LoadDataSources()
+    {
+        DataSources = await dataSourceService.GetData();
+        // webapipi_Server is the only relevant datasource in use. Users found the other options irrelevant, since it did nothing.
+        DataConfig.DataSource = DataSources.Where(ds => ds.Name.Equals("webapipi_Server")).First();
+    }
+
+    private async Task LoadMonitorInfoIn()
+    {
+        if (DataConfig.ProjectDTO != null)
+        {
+            var request = new MonitorInfoRequest() { DataSourceId = DataConfig.DataSource.DataSourceId, ProjectId = DataConfig.ProjectDTO.Id };
+            // Receive monitor-info
+            monitorInfo = await monitorDataService.GetMonitorInfoAsync(request);
+            TimeLevels = monitorInfo.TimeLevels.ToList();
+            // Assign sensors
+            Sensors = monitorInfo.Observations
+            .Where(obs => obs.ValueTypeIds.Length != 0).Select(Sensors =>(SensorDTO) Sensors).ToList();
+            // Map sensors with <id, valueTypes>
+            SensorVTCombination.Clear();
+            monitorInfo.Observations
+            .Where(obs => obs.ValueTypeIds.Length != 0).ToList().ForEach((sensors) => SensorVTCombination.Add(sensors.Id, sensors.ValueTypeIds));
+        }
+    }
+
+    private async Task LoadProjects()
+    {
+        if (DataConfig.DataSource != null)
+        {
+            var results = await dataSourceService.GetOne(DataConfig.DataSource.DataSourceId);
+            Projects = results.projectSourceDTOs;
+        }
+    }
+
+    public async Task OnProjectSelection(ProjectSourceDTO? selectedProjects)
+    {
+        Console.WriteLine("On project selection");
+
+        if (DataConfig.ProjectDTO != null && DataConfig.ProjectDTO.Id == selectedProjects?.Id)
+        {
+            return;
+        }
+        else
+        {
+            DataConfig.ProjectDTO = selectedProjects;
+            ClearSensorAndVT();
+            await LoadMonitorInfoIn();
+        }
+    }
+
+    private void ClearSensorAndVT()
+    {
+        DataConfig.SensorsSelected = Enumerable.Empty<SensorDTO>();
+        DataConfig.ValueTypesSelected = Enumerable.Empty<ValueTypeDTO>();
+    }
+
+    public async Task OnDataSourceSelection(DataSourceDTO dataSource)
+    {
+        // If data source is
+        if (dataSource == null)
+        {
+            await OnProjectSelection(null);
+        }
+        DataConfig.DataSource = dataSource;
+        await LoadProjects();
+    }
+
+    public void OnSensorSelection(IEnumerable<SensorDTO> selection)
+    {
+        // Assign sensors to the form (in this case the DTO)
+        DataConfig.SensorsSelected = selection;
+        if (selection == null) return;
+        HashSet<int> selectionIds = selection.Select(sensors => sensors.Id).ToHashSet();
+        HashSet<int> valueTypeIdsSet = new();
+        // Grab all ids of the selection;
+        foreach (var id in selectionIds)
+        {
+            if (SensorVTCombination.TryGetValue(id, out int[] val))
+            {
+                valueTypeIdsSet.UnionWith(val);
+            }
+        }
+        // Select valuetypes matching the selection.
+        var result = monitorInfo.Valuetypes.Where(vt => valueTypeIdsSet.Contains(vt.Id));
+        // Assign filtered valuetypes to form. By Upcasting to its parent class
+        ValueTypes = result.Select(mvt => (ValueTypeDTO) mvt).ToList();
+        // If possible remove vt's. Temp solution.
+        var selected =  DataConfig.ValueTypesSelected.Where(vt => valueTypeIdsSet.Contains(vt.Id)).ToList();
+        DataConfig.ValueTypesSelected = selected;
+    }
+
+    private async Task<DataExtractConfigDTO?> RegisterProcessAsync()
+    {
+        return Status.Equals(DataProcesState.CONCEPT)
+            ? await DataExtractProcessService.RegisterDataExtractProcess(DataConfig)
+            : await DataExtractProcessService.UpdateDataExtractProcess(DataConfig.ProcessId, DataConfig);
+    }
+
+    public async Task Confirm()
+    {
+        ExceptionMessage = string.Empty;
+        var result = await RegisterProcessAsync();
+
+        if (result == null)
+        {
+            ExceptionMessage = "Er is iets foutgegaan binnen het systeem. Probeer het later nog eens";
+            return;
+        }
+
+        DataExtractProcess.DataProcess = result;
+        if (Status.Equals(DataProcesState.CONCEPT))
+        {
+            DataExtractProcess.Status = DataProcesState.SET;
+        }
+        MudDialog.Close(DialogResult.Ok(DataExtractProcess.DataProcess));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

@@ -1,0 +1,105 @@
+﻿@page "/workspace/{WorkspaceGuid:guid}"
+@inject IJSRuntime JS 
+@inject IWorkspaceManager WorkspaceManager
+
+@using Leap.ApplicationServices.DTO
+@using Leap.ApplicationServices.DTO.DataProcessDTO
+@using Leap.ApplicationServices.DTO.ModelDTO
+@using Leap.ApplicationServices.DTO.Workspace
+@using Leap.ApplicationServices.Interfaces.ClientServerProxy
+@using LeapDataScienceTool.Components.Aggregation___KPI
+@using LeapDataScienceTool.Components.DataSourceProcess
+@using LeapDataScienceTool.Components.ModelingProcess
+@using LeapDataScienceTool.Components.WorkspaceEdit
+@using LeapDataScienceTool.PageManagers
+
+<div class="container-fluid">
+	<div class="row">
+		<MudGrid>
+			<MudItem xs="4">
+				<MudIconButton Icon="@Icons.Material.Filled.ArrowBackIos" Href="workspace" />
+			</MudItem>
+			<MudItem xs="8">
+				<h1>@workspaceConfigDTO.WorkspaceName</h1>
+			</MudItem>
+		</MudGrid>
+	</div>
+
+	@if (Loaded)
+	{
+		<MudGrid>
+
+			<MudItem xs="9">
+				<div class="p-1 mud-elevation-1 justify-content-center">
+					<MudText Typo="Typo.h6" Class="mb-1 me-1 ps-2"><MudIcon Size="Size.Medium" Icon="@Icons.Material.Filled.DatasetLinked"></MudIcon> Databron instellingen</MudText>
+					<!-- Test case only extract processes allowed. Cannot be dropped in when-->
+					<DataSourceComponent  WorkspaceGuid="WorkspaceGuid" DataSourceConfig="workspaceConfigDTO.DataSourceConfig" />
+				</div>
+			</MudItem>
+			<MudItem xs="3" Class="mt-2">
+				<WorkspaceAction />
+			</MudItem>
+			<MudItem xs="12">
+				<DynamicCalculationComponent @ref=DynamicKPIComponent />
+			</MudItem>
+			<MudItem xs="9">
+				<div class="mud-elevation-1 p-2">
+					<MudText Typo="Typo.h6" Class="mb-4 ps-6 justify-content-center"><MudIcon Size="Size.Medium" Icon="@Icons.Material.Filled.Settings"></MudIcon> Model instellingen</MudText>
+					<ModelingComponent @ref=ModelingComponent/>
+				</div>
+			</MudItem>
+		</MudGrid>
+	}
+	else
+	{
+		<MudProgressCircular Color="Color.Default" Indeterminate="true" />
+	}
+</div>
+
+@code {
+	[Parameter]
+	public Guid WorkspaceGuid { get; set; }
+
+	// Will be needed to load in data inside the selection menu.
+	public WorkspaceConfigDTO workspaceConfigDTO = new();
+
+	// Basic implementation
+	public required DynamicCalculationComponent DynamicKPIComponent { get; set; }
+	public required ModelingComponent ModelingComponent { get; set; }
+
+	public bool Loaded { get; set; } = false;
+	private string PageName { get; set; } = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			Console.WriteLine("Loading workspace done");
+			await WorkspaceManager.LoadAllAssets(WorkspaceGuid);
+			workspaceConfigDTO = WorkspaceManager.GetWorkspaceConfigDTO();
+			PageName = workspaceConfigDTO.WorkspaceName;
+			// Setup Eventhandlers in workspace manager.
+			WorkspaceManager.DataSourceChanged += InvokeDataSourceChanged;
+			Loaded = true;
+		}
+		catch(Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+			Loaded = true;
+		}
+		await base.OnInitializedAsync();
+	}
+
+	private void InvokeDataSourceChanged(object sender, EventArgs e)
+	{
+		// Overwrite method of a component
+		DynamicKPIComponent.Synchronize(e);
+		ModelingComponent.Synchronize(e);
+	}
+
+	// private void InvokeDynamicKPIChange(object sender, EventArgs args)
+	// {
+	//  //	If sender is DynamicCalculationComponent
+	// 	ModelingComponent.Synchronize(args);
+	// }
+}

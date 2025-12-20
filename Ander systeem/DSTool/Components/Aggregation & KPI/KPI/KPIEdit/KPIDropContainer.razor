@@ -1,0 +1,129 @@
+﻿@using Leap.ApplicationServices.DTO
+@using LeapDataScienceTool.Components.Aggregation___KPI
+@using LeapDataScienceTool.PageManagers
+
+@inject IWorkspaceManager Manager 
+<!--NOTE: PROTOTYPE-->
+<MudDropContainer T="Operation" Items="Operations" ItemsSelector="@((item, zone) => item.Id == zone)" ItemDropped="InsertIntoDropzone" Class="">
+	<ChildContent>
+		<MudGrid>
+
+			<!-- Fields with Inner Dropzones -->
+			<MudItem xs="9" Class="pa-4 my-4">
+				
+				<!-- Deze drop containers laden de velden in laad velden in -->
+				<MudDropContainer @ref="_dropContainer" T="KPIFieldZone" Items="_zones" ItemDisabled="@(item => true)" ItemsSelector="@((item, dropzone) => true)" Class="5">
+					<ChildContent>
+						<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddField">Voeg veld toe</MudButton>
+						<MudDropZone T="KPIFieldZone" AllowReorder Class="6 rounded mud-background-gray px-4 py-1 ma-4" />
+					</ChildContent>
+					<ItemRenderer>
+						<MudPaper Class="pa-4 my-4">
+							<MudGrid>
+								<MudItem xs="5">
+									<MudText Typo="Typo.h6">@context.Name</MudText>
+								</MudItem>
+								<MudItem xs="7">
+									<MudTextField T="string" Label="Benoem veld"></MudTextField>
+								</MudItem>
+							</MudGrid>
+							<MudItem xs="12">
+								<MudDropZone T="Operation" Identifier="@context.Name" AllowReorder
+											 Class="rounded mud-background-gray px-4 py-1 ma-4 d-flex flex-wrap flex-grow-1  border-dotted border-2 mud-border-primary "
+								 Style="min-height: 40px;"/>
+							</MudItem>
+						</MudPaper>
+					</ItemRenderer>
+				</MudDropContainer>
+			</MudItem>
+
+			<!-- Dropzones for Operations -->
+			<MudItem xs="3" Class="pa-4 my-4">
+				<MudDropZone T="Operation" Identifier="calculation_zone" Class="rounded mud-background-gray px-4 py-1 ma-4">
+					<MudText>Calculation Zone</MudText>
+				</MudDropZone>
+				<MudDropZone T="Operation" Identifier="column_zone" Class="rounded mud-background-gray px-4 py-1 ma-4">
+					<MudText>Column Zone</MudText>
+				</MudDropZone>
+			</MudItem>
+		</MudGrid>
+	</ChildContent>
+
+	<ItemRenderer>
+		<div>
+			<MudPaper Class="pa-4 my-4" Style="width: auto">
+				<!-- Het element dat gerenderd wordt-->
+				<MudText>@context.Column</MudText>
+			</MudPaper>
+		</div>
+		
+	</ItemRenderer>
+</MudDropContainer>
+
+@code {
+	private MudDropContainer<KPIFieldZone> _dropContainer { get; set; }
+
+	public readonly List<Operation> Operations = new();
+	public int Index { get; set; } = 3;
+	private List<KPIFieldZone> _zones = new()
+	{
+		new() { Name = "Voorbeeld veld 1" },
+		new() { Name = "Voorbeeld veld 2" }
+	};
+
+	protected override void OnInitialized()
+	{
+		Operations.AddRange(LoadOperators());
+		base.OnInitialized();
+	}
+
+	private void AddField()
+	{
+		_zones.Add(new KPIFieldZone() { Name = $"Voorbeeld veld {Index}" });
+		StateHasChanged();
+		Index++;
+		Console.WriteLine($"Voorbeeld veld {Index} toegevoegd");
+		Console.WriteLine(_zones.Count);
+		_dropContainer.Refresh();
+	}
+	private void InsertIntoDropzone(MudItemDropInfo<Operation> dropItem)
+	{
+		string targetDropzone = dropItem.DropzoneIdentifier;
+		var operat = dropItem.Item;
+		if (targetDropzone == operat.Id)
+		{
+			Console.WriteLine("Do nothing. Its the same zone");
+		}
+		else
+		{
+			Console.WriteLine("Item is allowed");
+			var copied = operat.DeepCopy();
+			copied.Id = targetDropzone;
+			Operations.Add(copied);
+		}
+	}
+
+	private IEnumerable<DataColumnDTO> LoadColumns()
+	{
+		return Manager.GetColumns();
+	}
+
+	public List<Operation> LoadOperators()
+	{
+		var operators = new List<Operation>()
+		{
+			new Operation(){ Column = "+", Operator = "calculation",  Id = "calculation_zone"},
+			new Operation(){ Column = "-", Operator = "calculation",  Id = "calculation_zone"},
+			new Operation(){ Column = "*", Operator = "calculation",  Id = "calculation_zone"},
+			new Operation(){ Column = "/", Operator = "calculation",  Id = "calculation_zone"},
+		};
+		var columnOperators = LoadColumns().Select((col) => new Operation() { Column = col.ColumnName, Operator = "number_column", Id = "column_zone" });
+		operators.AddRange(columnOperators);
+		return operators;
+	}
+
+	private class KPIFieldZone
+	{
+		public string Name { get; init; }
+	}
+}

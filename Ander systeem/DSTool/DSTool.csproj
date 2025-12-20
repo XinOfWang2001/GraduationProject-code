@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Components\DataCalculationProcess\**" />
+    <Compile Remove="Components\ErrorMessages\**" />
+    <Content Remove="Components\DataCalculationProcess\**" />
+    <Content Remove="Components\ErrorMessages\**" />
+    <EmbeddedResource Remove="Components\DataCalculationProcess\**" />
+    <EmbeddedResource Remove="Components\ErrorMessages\**" />
+    <None Remove="Components\DataCalculationProcess\**" />
+    <None Remove="Components\ErrorMessages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="8.3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.7" PrivateAssets="all" />
+    <PackageReference Include="MudBlazor" Version="8.11.0" />
+    <PackageReference Include="ScottPlot.Blazor" Version="5.0.55" />
+	<PackageReference Include="SkiaSharp.HarfBuzz" Version="3.119.0" />
+	<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.0" />
+	<PackageReference Include="SkiaSharp.Views.Blazor" Version="3.119.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+
+</Project>

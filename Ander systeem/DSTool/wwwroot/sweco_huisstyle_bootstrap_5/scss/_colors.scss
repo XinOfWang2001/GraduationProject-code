@@ -1,0 +1,463 @@
+// Sweco color classes
+
+// Black
+.black,
+.bg-black {
+  background-color: $black;
+}
+
+.black-light,
+.bg-black-light {
+  background-color: $black-light;
+}
+
+.black-lighter,
+.bg-black-lighter {
+  background-color: $black-lighter;
+}
+
+.black-superlight,
+.bg-black-superlight {
+  background-color: $black-superlight;
+}
+
+.black-color,
+.text-black-color {
+  color: $black;
+}
+
+.black-light-color,
+.text-black-light {
+  color: $black-light;
+}
+
+.black-lighter-color,
+.text-black-lighter {
+  color: $black-lighter;
+}
+
+.black-superlight-color,
+.text-black-superlight {
+  color: $black-superlight;
+}
+
+// Sweco Gray
+.gray-dark,
+.bg-gray-dark {
+  background-color: $gray-dark;
+}
+
+.gray,
+.bg-gray {
+  background-color: $gray;
+}
+
+.gray-light,
+.bg-gray-light {
+  background-color: $gray-light;
+}
+
+.gray-lighter,
+.bg-gray-lighter {
+  background-color: $gray-lighter;
+}
+
+.gray-dark-color,
+.text-gray-dark {
+  color: $gray-dark;
+}
+
+.gray-color,
+.text-gray {
+  color: $gray;
+}
+
+.gray-light-color,
+.text-gray-light {
+  color: $gray-light;
+}
+
+.gray-lighter-color,
+.text-gray-lighter {
+  color: $gray-lighter;
+}
+
+// Sweco green
+.green-dark,
+.bg-green-dark {
+  background-color: $green-dark;
+}
+
+.green,
+.bg-green {
+  background-color: $green;
+}
+
+.green-light,
+.bg-green-light {
+  background-color: $green-light;
+}
+
+.green-lighter,
+.bg-green-lighter {
+  background-color: $green-lighter;
+}
+
+.green-dark-color,
+.text-green-dark {
+  color: $green-dark;
+}
+
+.green-color,
+.text-green {
+  color: $green;
+}
+
+.green-light-color,
+.text-green-light {
+  color: $green-light;
+}
+
+.green-lighter-color,
+.text-green-lighter {
+  color: $green-lighter;
+}
+
+// Sweco Blue
+.blue-dark,
+.bg-blue-dark {
+  background-color: $blue-dark;
+}
+
+.blue,
+.bg-blue {
+  background-color: $blue;
+}
+
+.blue-light,
+.bg-blue-light {
+  background-color: $blue-light;
+}
+
+.blue-lighter,
+.bg-blue-lighter {
+  background-color: $blue-lighter;
+}
+
+.blue-dark-color,
+.text-blue-dark {
+  color: $blue-dark;
+}
+
+.blue-color,
+.text-blue {
+  color: $blue;
+}
+
+.blue-light-color,
+.text-light-color {
+  color: $blue-light;
+}
+
+.blue-lighter-color,
+.text-blue-lighter {
+  color: $blue-lighter;
+}
+
+// Sweco Ochre
+.ochre-dark,
+.bg-ochre-dark {
+  background-color: $ochre-dark;
+}
+
+.ochre,
+.bg-ochre {
+  background-color: $ochre;
+}
+
+.ochre-light,
+.bg-ochre-light {
+  background-color: $ochre-light;
+}
+
+.ochre-lighter,
+.bg-ochre-lighter {
+  background-color: $ochre-lighter;
+}
+
+.ochre-dark-color,
+.text-ochre-dark {
+  color: $ochre-dark;
+}
+
+.ochre-color,
+.text-ochre-color {
+  color: $ochre;
+}
+
+.ochre-light-color,
+.text-ochre-light {
+  color: $ochre-light;
+}
+
+.ochre-lighter-color,
+.text-ochre-lighter {
+  color: $ochre-lighter;
+}
+
+
+// Dark and light gray (2022 expired now uses Sweco gray)
+.dark-gray {
+  background-color: $gray-dark;
+}
+
+.dark-gray-light {
+  background-color: $gray-light;
+}
+
+.dark-gray-lighter {
+  background-color: $gray-lighter;
+}
+
+.dark-gray-color {
+  color: $gray-dark;
+}
+
+.dark-gray-light-color {
+  color: $gray-light;
+}
+
+.dark-gray-lighter-color {
+  color: $gray-lighter;
+}
+
+.light-gray {
+  background-color: $gray;
+}
+
+.light-gray-light {
+  background-color: $gray-light;
+}
+
+.light-gray-lighter {
+  background-color: $gray-lighter;
+}
+
+.light-gray-color {
+  color: $gray;
+}
+
+.light-gray-light-color {
+  color: $gray-light;
+}
+
+.light-gray-lighter-color {
+  color: $gray-lighter;
+}
+
+// Sweco Pink (2022 do not use)
+.pink-dark {
+  background-color: $pink-dark;
+}
+
+.pink {
+  background-color: $pink;
+}
+
+.pink-light {
+  background-color: $pink-light;
+}
+
+.pink-lighter {
+  background-color: $pink-lighter;
+}
+
+.pink-dark-color {
+  color: $pink-dark;
+}
+
+.pink-color {
+  color: $pink;
+}
+
+.pink-light-color {
+  color: $pink-light;
+}
+
+.pink-lighter-color {
+  color: $pink-lighter;
+}
+
+
+// Success
+.success,
+.v-success,
+.bg-success {
+  background-color: $success;
+}
+
+.success-color,
+.v-success-color {
+  color: $success;
+}
+
+// Red Alert
+.v-alert,
+.bg-alert,
+.bg-red {
+  background-color: $red;
+}
+
+.v-alert-color,
+.alert-color,
+.red-color {
+  color: $red;
+}
+
+// White
+.white,
+.bg-white {
+  background-color: $white;
+}
+
+.white-color {
+  color: $white;
+}
+
+// Link color
+.link-color {
+  color: $link-color;
+}
+
+// Text color
+.text-color {
+  color: $text-color;
+}
+
+
+// Sweco - for demo colors
+.colors {
+  ul {
+    @extend .list-unstyled;
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      min-height: 32px;
+      margin: 0;
+      padding: 12px ($spacer * .5);
+
+      code {
+        margin: -3px 0 -3px ($spacer * .5);
+      }
+    }
+  }
+}
+
+.color-black {
+  .color {
+    background-color: $black;
+  }
+
+  .light {
+    background-color: $black-light;
+  }
+
+  .lighter {
+    background-color: $black-lighter;
+  }
+
+  .superlight {
+    background-color: $black-superlight;
+  }
+}
+
+.color-gray {
+  .dark {
+    background-color: $gray-dark;
+  }
+
+  .color {
+    background-color: $gray;
+  }
+
+  .light {
+    background-color: $gray-light;
+  }
+
+  .lighter {
+    background-color: $gray-lighter;
+  }
+
+  .superlight {
+    background-color: $gray-lighter;
+  }
+}
+
+.color-green {
+  .dark {
+    background-color: $green-dark;
+  }
+
+  .color {
+    background-color: $green;
+  }
+
+  .light {
+    background-color: $green-light;
+  }
+
+  .lighter {
+    background-color: $green-lighter;
+  }
+}
+
+.color-blue {
+  .dark {
+    background-color: $blue-dark;
+  }
+
+  .color {
+    background-color: $blue;
+  }
+
+  .light {
+    background-color: $blue-light;
+  }
+
+  .lighter {
+    background-color: $blue-lighter;
+  }
+}
+
+.color-ochre {
+  .dark {
+    background-color: $ochre-dark;
+  }
+
+  .color {
+    background-color: $ochre;
+  }
+
+  .light {
+    background-color: $ochre-light;
+  }
+
+  .lighter {
+    background-color: $ochre-lighter;
+  }
+}
+
+.color-v-alert {
+  .color {
+    background-color: $danger;
+    color: $white !important;
+  }
+}
+
+.color-v-success {
+  .color {
+    background-color: $success;
+    color: $white !important;
+  }
+}

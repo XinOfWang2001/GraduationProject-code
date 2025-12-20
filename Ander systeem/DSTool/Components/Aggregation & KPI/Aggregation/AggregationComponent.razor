@@ -1,0 +1,15 @@
+﻿<MudPaper Elevation="25" Class="pa-4 my-4 w-100 align-center d-flex">
+	<MudChip T="string" Color="Color.Dark">@dataProcess.Order</MudChip>
+	<h5 class="m-0">@dataProcess.DataProcessType</h5>
+	<MudSpacer />
+	@if (dataProcess.IsPicked)
+	{
+		<MudButton Class="edit_color">Wijzig</MudButton>
+	}
+	
+</MudPaper>
+
+@code {
+	[Parameter]
+	public required IDataProcess dataProcess { get; set; }
+}

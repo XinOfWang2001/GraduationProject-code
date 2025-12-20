@@ -1,0 +1,11 @@
+﻿<MudText Typo="Typo.h6">@Metric</MudText>
+<MudText Typo="Typo.subtitle1">@Value</MudText>
+
+@code {
+
+    [Parameter]
+    public required string Metric { get; set; }
+
+    [Parameter]
+    public required float Value { get; set; }
+}

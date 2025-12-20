@@ -1,0 +1,42 @@
+﻿@inherits ComponentBase
+
+<MudDropContainer T="Operation" Items="InputOperations" ItemsSelector="@((item, zone) => item.Id == zone)" ItemDropped="ItemUpdated">
+    <ChildContent>
+        <MudText>Drop zone for field @Index</MudText>
+        <MudDropZone T="Operation" Identifier="@InputZoneId" Class="rounded mud-background-gray px-4 py-1 ma-4" Style="min-height: 40px;">
+        </MudDropZone>
+    </ChildContent>
+
+    <ItemRenderer>
+        <MudPaper Class="pa-4 my-4">
+            <MudText Typo="Typo.h6">@context.Column</MudText>
+        </MudPaper>
+    </ItemRenderer>
+</MudDropContainer>
+
+@code {
+    [Parameter]
+    public int Index { get; set; }
+
+    private string InputZoneId => $"field_{Index}";
+
+    public List<Operation> InputOperations { get; } = new();
+
+    protected override void OnInitialized()
+    {
+        List<Operation> Ops = new List<Operation>
+        {
+            new Operation() { Id = InputZoneId, Column = "column1", Operator = "numeric" }
+        };
+        InputOperations.AddRange(Ops);
+        base.OnInitialized();
+    }
+
+    private void ItemUpdated(MudItemDropInfo<Operation> dropItem)
+    {
+        string targetDropzone = dropItem.DropzoneIdentifier;
+        var operat = dropItem.Item;
+        Console.WriteLine($"Dropped in {InputZoneId}");
+        dropItem.Item.Id = dropItem.DropzoneIdentifier;
+    }
+}

@@ -1,0 +1,9 @@
+﻿{
+  "WorkspaceGuid": "af4ac3ed-dd79-407d-8fcd-77c984974657",
+  "ModelAddress": "/dev/af4ac3ed-dd79-407d-8fcd-77c984974657_FORECASTING_model.pkl",
+  "ModelName": "test model",
+  "ModelVersion": "latest",
+  "ModelType": 0,
+  "ModelAlgorithm": 0,
+  "DateOfCreation": "2025-06-07T19:00:00Z"
+}

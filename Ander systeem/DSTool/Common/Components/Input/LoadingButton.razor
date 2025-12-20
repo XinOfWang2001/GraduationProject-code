@@ -1,0 +1,46 @@
+﻿<MudButton Class=@CSSTags Variant=@ButtonVariant Color=@ButtonColor Disabled=@(EnableButton()) OnClick="Press">
+    @if (Loading)
+    {
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    }
+    else
+    {
+        @ButtonName
+    }
+</MudButton>
+
+@code {
+    [Parameter]
+    public required string ButtonName { get; set; }
+    [Parameter]
+    public string? CSSTags { get; set; }
+    [Parameter]
+    public bool ExternalCondition { get; set; } = false;
+    [Parameter]
+    public Color ButtonColor { get; set; } = Color.Default;
+    [Parameter]
+    public Variant ButtonVariant { get; set; } = Variant.Filled;
+
+    private bool Loading { get; set; } = false;
+    private bool Disabled { get; set; } = false;
+
+    [Parameter]
+    public required EventCallback TriggerMethod { get; set; }
+
+    public async Task Press()
+    {
+        Loading = true;
+        Disabled = true;
+        Console.WriteLine("Waiting...");
+        // Execute parent logic. The button should do nothing but execute the method and wait till its done.
+        await TriggerMethod.InvokeAsync();
+        Console.WriteLine("Process completed");
+        Loading = false;
+        Disabled = false;
+    }
+
+    public bool EnableButton()
+    {
+        return ExternalCondition || Disabled;
+    }
+}

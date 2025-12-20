@@ -1,0 +1,38 @@
+﻿@using Leap.ApplicationServices.DTO.Workspace
+@using Leap.ApplicationServices.Interfaces.ClientServerProxy
+@using LeapDataScienceTool.Common.Components.Input
+@using LeapDataScienceTool.Common.Services
+
+@inject IWorkspaceService workspaceService
+@inject ResponseService Response
+
+<MudDialog Class="container">
+    <TitleContent>
+        <MudText Typo="Typo.h5">Weet je zeker dat je werkruimte @workspaceConfig.WorkspaceName wil verwijderen?</MudText>
+    </TitleContent>
+    <DialogContent>
+        
+    </DialogContent>
+    <DialogActions>
+        <MudButton class="delete_color" OnClick="Cancel">Annuleer</MudButton>
+        <LoadingButton CSSTags="add_color" TriggerMethod="Confirm" ButtonName="Bevestig"></LoadingButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public IMudDialogInstance DialogInstance { get; set; }
+
+    [Parameter]
+    public required WorkspaceConfigDTO workspaceConfig { get; set; }
+
+    public async Task Confirm()
+    {
+        await workspaceService.DeleteWorkspace(workspaceConfig.WorkspaceGuid);
+        Console.WriteLine("Done deletion");
+        Response.ShowSuccessfullResponse("Werkruimte is succesvol verwijderd");
+        DialogInstance.Close(DialogResult.Ok(true));
+    }
+
+    private void Cancel() => DialogInstance.Cancel();
+}

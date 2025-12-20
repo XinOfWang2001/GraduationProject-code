@@ -1,0 +1,58 @@
+﻿@using Leap.ApplicationServices.DTO.External_Services
+@using LeapDataScienceTool.Common.Abstractions;
+@inherits AbstractTableComponent 
+
+<MudTable Items="@ObservationValuetypes" Hover="true" SortLabel="Sort By">
+	<PagerContent>
+		<MudTablePager PageSizeOptions="new int[] { 5, 10, 25 }" />
+	</PagerContent>
+	<HeaderContent>
+		<MudTh>SensorId</MudTh>
+		<MudTh>Name</MudTh>
+		<MudTh>Waardetypen van toepassing</MudTh>
+	</HeaderContent>
+	<RowTemplate>
+		<MudTd DataLabel="Id">@context.Id</MudTd>
+		<MudTd DataLabel="Name">@context.Name</MudTd>
+		<MudTd DataLabel="Waardetypen">
+			@foreach (var vt in context.ValueTypes)
+			{
+				<span class="badge rounded-pill text-bg-primary">(@vt.Id) @vt.UnitAbbr</span>
+			}
+		</MudTd>
+	</RowTemplate>
+</MudTable>
+
+@code {
+	[Parameter]
+	public required MonitorInfoDTO monitorInfoDTO { get; set; }
+	public List<MonitorObservationValuetype> ObservationValuetypes = new();
+
+	protected override void OnInitialized()
+	{
+		BuildTable();
+		base.OnInitialized();
+	}
+
+	protected override void OnParametersSet()
+	{
+		Console.WriteLine("Reload parameters");
+		BuildTable();
+		base.OnParametersSet();
+	}
+
+	protected override void BuildTable()
+	{
+		ObservationValuetypes = monitorInfoDTO.Observations
+		.Select(sensor =>
+			new MonitorObservationValuetype()
+			{
+				Id = sensor.Id,
+				Name = sensor.Name,
+				ValueTypes = monitorInfoDTO.Valuetypes
+				.Where(vt => sensor.ValueTypeIds.Contains(vt.Id))
+				.ToList()
+			})
+		.ToList();
+	}
+}

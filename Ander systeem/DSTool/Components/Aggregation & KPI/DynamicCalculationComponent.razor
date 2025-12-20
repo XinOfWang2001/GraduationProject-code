@@ -1,0 +1,206 @@
+﻿@using Leap.ApplicationServices.DTO.Calculations
+@using Leap.ApplicationServices.Interfaces.ClientServerProxy
+@using Leap.Domain.Domain.Calculations
+@using LeapDataScienceTool.Common.Services
+@using LeapDataScienceTool.Components.Aggregation___KPI
+@using LeapDataScienceTool.Common.Abstractions
+@using LeapDataScienceTool.Components.Aggregation___KPI.Aggregation
+@using LeapDataScienceTool.Components.Aggregation___KPI.KPI
+@using LeapDataScienceTool.PageManagers
+@using MudBlazor.Utilities
+@using LeapDataScienceTool.Common.Components.Input
+
+@inject ResponseService Service
+@inject ICalculationService CalculationService 
+@inject IWorkspaceManager Manager 
+@inherits SynchronizerComponent
+
+
+<MudDropContainer T="IDataProcess" @ref="_dropContainer" Items="DataProcesses" ItemsSelector="@((item, dropzone) => item.Zone == dropzone)" ItemDropped="InsertIntoDropzone" Class="d-flex flex-wrap flex-grow-1">
+	<ChildContent>
+		<MudGrid Class="mt-1">
+			<!-- Aggregaties, dynamische KPI ontwikkeling, Tussen modellen -->
+			<MudItem xs="9">
+				<div class="mud-elevation-1 p-2 me-1">
+					<MudText Typo="Typo.h6" Class="mb-3 ps-2"><MudIcon Icon="@Icons.Material.Filled.DragIndicator" Size="Size.Medium"></MudIcon> Data manipulatie instellingen. <MudChip T="string" Color="Color.Primary">(Work in progress)</MudChip></MudText>
+					<MudDropZone T="IDataProcess" 
+						CanDropClass="KPIProcess" 
+						Identifier="DataManipulator"
+						AllowReorder="true"
+						Class="rounded border-dotted border-2 mud-border-primary mud-background-gray pa-4 min-height-dropzone" 
+						Style="min-height:12em">
+					</MudDropZone>
+					@if (HasChanged)
+					{
+						<LoadingButton CSSTags="action_color" TriggerMethod="SaveChanges" ButtonName="Opslaan"></LoadingButton>
+					}
+				</div>
+				
+			</MudItem>
+			<!-- Keuzemenu-->
+			<MudItem xs="3" class="">
+				<div class="mud-elevation-1 p-2 me-1">
+					<MudText Typo="Typo.h6" Class="mb-3 ps-2"><MudIcon Icon="@Icons.Material.Filled.DragIndicator" Size="Size.Medium"></MudIcon> Preprocessing-menu: </MudText>
+					<MudDropZone T="IDataProcess" Identifier="SelectCalculation" Class="rounded border-dotted border-2 mud-border-primary mud-background-gray pa-4 d-flex flex-grow-1 min-height-dropzone" Style="min-height:12em">
+					</MudDropZone>
+				</div>
+			</MudItem>
+		</MudGrid>
+	</ChildContent>
+	<ItemRenderer>
+		@if (context.DataProcessType.Equals(nameof(KPIProcess)))
+		{
+			<CalculationComponent dataProcess="@context"></CalculationComponent>
+
+		}
+		else
+		{
+			<AggregationComponent dataProcess="@context"></AggregationComponent>
+		}
+	</ItemRenderer>
+</MudDropContainer>
+
+@code{
+	private MudDropContainer<IDataProcess>? _dropContainer { get; set; }
+	// Used to store all the dropitems. Zone is dependent on Zone Attribute. It will contain a reference
+	public List<IDataProcess> DataProcesses = [];
+
+	private int excludeSelectionVariable { get; set; } = -1;
+	private bool HasChanged { get; set; } = false;
+
+
+	protected override void OnInitialized()
+	{
+		// Load current payload inside.
+		DataProcesses.AddRange(LoadChoices());
+		foreach (var step in LoadCurrentSteps())
+		{
+			var item = ConvertProcess(step);
+			DataProcesses.Add(item);
+		}
+		_dropContainer?.Refresh();
+	}
+
+	private IDataProcess ConvertProcess(CalculationStepDTO DTO)
+	{
+		// If KPI, the KPIProcess should be made
+		if (DTO.CalculationType.Equals(CalculationType.KPI))
+		{
+			var item = new KPIProcess("DataManipulator");
+			item.CalculationStep = DTO;
+			item.IsPicked = true;
+			return item;
+		}
+		else
+		{
+			var item = new AggregationProcess("DataManipulator");
+			item.CalculationStep = DTO;
+			item.IsPicked = true;
+			return item;
+		}
+	}
+
+	protected IEnumerable<CalculationStepDTO> LoadCurrentSteps()
+	{
+		var result = Manager.GetWorkspaceConfigDTO().CalculationStepsDTO;
+		return result;
+	}
+
+	// Most important business logic on client side.
+	public void InsertIntoDropzone(MudItemDropInfo<IDataProcess> dropItem)
+	{
+		int indexInsertion = dropItem.IndexInZone;
+		string targetDropzone = dropItem.DropzoneIdentifier;
+		IDataProcess dataProcess = dropItem.Item;
+		if (IsComponentAllowed("SelectCalculation", targetDropzone, dataProcess.Zone))
+		{
+			Console.WriteLine("Item is thrown away");
+			DataProcesses.Remove(dataProcess);
+		}
+		else if(dropItem.Item.Zone == dropItem.DropzoneIdentifier)
+		{
+			bool hasDeleted = DataProcesses.Remove(dataProcess);
+			Console.WriteLine($"Deletion Succesfull: {hasDeleted}");
+			dataProcess.Order = indexInsertion;
+			DataProcesses.Insert(indexInsertion, dataProcess);
+			Console.WriteLine("Nothing ever happens"); 
+		}
+		else
+		{
+			Console.WriteLine($"Item is allowed in {targetDropzone}");
+			var copied = dataProcess.DeepCopy();
+			copied.Zone = targetDropzone;
+			copied.IsPicked = true;
+			copied.Order = indexInsertion;
+			DataProcesses.Insert(indexInsertion, copied);
+
+
+		}
+		HasChanged = true;
+		ReorderItems();
+		_dropContainer.Refresh();
+	}
+
+	private void ReorderItems()
+	{
+		var zoneItems = DataProcesses
+				.Where(dp => dp.Order > -1)
+				.ToList();
+
+		for (int i = 0; i < zoneItems.Count; i++)
+		{
+			zoneItems[i].Order = i + 1;
+			zoneItems[i].CalculationStep.Order = i;
+		}
+
+	}
+
+	private List<IDataProcess> LoadChoices()
+	{
+		return new()
+		{
+			new KPIProcess("SelectCalculation") { CalculationStep = new CalculationStepDTO() { Order = 0, Calculations = []}  },
+			// new AggregationProcess("SelectCalculation")
+		};
+	}
+
+	public async Task SaveChanges()
+	{
+		try
+		{
+			Console.WriteLine("Dummy functie KPI's opslaan.");
+			var guid = Manager.GetWorkspaceConfigDTO().WorkspaceGuid;
+
+			var results = DataProcesses.Where((process) => process.Order > -1);
+			IEnumerable<CalculationStepDTO> selectedSteps = results.Select((steps) => steps.CalculationStep).ToList();
+			var hasSucceeded = await CalculationService.OverwriteCalculations(new CalculationWriteDTO() { Steps = selectedSteps, WorkspaceGuid = guid });
+			if (hasSucceeded.StatusCode >= 400)
+			{
+				Service.ShowErrorResponse(hasSucceeded.Message);
+			}
+			else
+			{
+				Service.ShowSuccessfullResponse("KPIS en Aggregaties succesfully saved.");
+			}
+			// Hide button after save
+			// Service.ShowSuccessfullResponse(hasSucceeded.Message);
+			HasChanged = false;
+		}
+		catch(Exception exception)
+		{
+			Console.WriteLine("Foutieve invoer");
+			Service.ShowErrorResponse("Er was iets misgegaan met het systeem. Neem alstublieft contact op met de ontwikkelaars.");
+		}
+	}
+
+	// Synchronization function
+	public override void Synchronize(EventArgs args)
+	{
+		Console.WriteLine("Check validity of dynamic component");
+	}
+
+	private bool IsComponentAllowed(string assignedZone, string targetZone, string currentZone)
+	{
+		return targetZone.Equals(assignedZone) && currentZone != targetZone;
+	}
+}

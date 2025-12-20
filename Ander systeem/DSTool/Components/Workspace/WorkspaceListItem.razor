@@ -1,0 +1,59 @@
+﻿@using Leap.ApplicationServices.DTO.DataProcessDTO
+@using Leap.ApplicationServices.DTO.Workspace
+@using Leap.ApplicationServices.Interfaces.ClientServerProxy
+
+@inject IDialogService dialog
+
+<MudItem xs="12">
+	<MudPaper Elevation="3" Class="p-3 mb-2">
+		<MudGrid>
+			<MudItem xs="6" class="text-start">
+				<MudText Align="Align.Left" Typo="Typo.h4">@workspaceConfig.WorkspaceName</MudText>
+			</MudItem>
+			<MudItem xs="6" class="text-end">
+				<MudIconButton Class="btn edit_color" Icon="@Icons.Material.Filled.Edit" Href="@navUrl" aria-label="Wijzigingsknop - Edit button"/>
+				<MudIconButton Class="btn delete_color" Icon="@Icons.Material.Filled.Delete" OnClick="Delete" aria-label="Verwijderknop - Delete button"/>
+			</MudItem>
+		</MudGrid>
+	</MudPaper>
+</MudItem>
+
+
+@code {
+	[Parameter]
+	public required WorkspaceConfigDTO workspaceConfig { get; set; }
+
+	[Parameter]
+	public EventCallback<int> OnWorkspaceDeletion { get; set; }
+
+	public string navUrl { get; set; } = string.Empty;
+
+	protected override void OnInitialized()
+	{
+		navUrl = $"workspace/{workspaceConfig.WorkspaceGuid}";
+	}
+
+	public async Task Delete()
+	{
+		try
+		{
+			DialogParameters<WorkspaceDeleteDialog> parameter = new()
+		{
+			{ x => x.workspaceConfig, workspaceConfig }
+		};
+			IDialogReference result = await dialog.ShowAsync<WorkspaceDeleteDialog>("Verwijder workspace pipeline", parameter);
+
+			var ok = await result.GetReturnValueAsync<bool>();
+			if (ok)
+			{
+				Console.WriteLine("Deletion dialog closed and succeeded");
+				await OnWorkspaceDeletion.InvokeAsync();
+			}
+		}
+		catch
+		{
+			Console.WriteLine("Canceled deletion");
+		}
+		
+	}
+}

@@ -1,0 +1,18 @@
+﻿@using Leap.ApplicationServices.DTO.ModelDTO
+@inherits IAlgorithmConfigComponent
+
+<MudNumericField Label="Stel het aantal Jobs in." @bind-Value=LinearRegressionDTO.NJobs></MudNumericField>
+@code {
+	public LinearRegressionDTO? LinearRegressionDTO { get; set; } = new();
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		LinearRegressionDTO = (LinearRegressionDTO) ModelConfigDTO.AlgorithmParameterDTO;
+	}
+
+	public override AlgorithmDTO AssignAlgorithm()
+	{
+		return LinearRegressionDTO;
+	}
+}

@@ -1,0 +1,26 @@
+﻿@using Leap.ApplicationServices.DTO.ModelDTO
+@inherits IAlgorithmConfigComponent
+
+<MudSelect Label="Selecteer kernel" @bind-Value=SVMDTO!.Kernel>
+	@foreach(var element in KernelChoice)
+	{
+		<MudSelectItem Value="element">@element</MudSelectItem>
+	}
+</MudSelect>
+
+@code {
+	public SVMDTO? SVMDTO { get; set; } = new();
+	public IEnumerable<string> KernelChoice = ["rbf", "sigmoid", "poly", "linear"];
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		Console.WriteLine("SVM is chosen");
+		SVMDTO = (SVMDTO) ModelConfigDTO.AlgorithmParameterDTO;
+	}
+
+	public override AlgorithmDTO AssignAlgorithm()
+	{
+		return SVMDTO!;
+	}
+}

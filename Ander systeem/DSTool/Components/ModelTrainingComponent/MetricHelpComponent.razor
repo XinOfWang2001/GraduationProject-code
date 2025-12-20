@@ -1,0 +1,87 @@
+﻿<MudPaper Class="pa-4">
+	<MudStack Spacing="2">
+		<MudButton OnClick="OpenLegenda">Hulp metrieken <MudIcon Icon="@Icons.Material.Filled.HelpCenter"></MudIcon></MudButton>
+		<MudDivider />
+		<MudCollapse Expanded="PopOver">
+			<MudText Typo="Typo.h6">RMSE: Root Mean Square Error</MudText>
+			<MudText Typo="Typo.caption">
+				@DescriptionRMSE
+			</MudText>
+			<MudText>Voordelen:</MudText>
+			<MudDivider />
+			<ul>
+				@foreach (var pros in ProsRMSE)
+				{
+					<li>
+						<MudText Typo="Typo.caption">@pros</MudText>
+					</li>
+				}
+			</ul>
+			
+			<MudText>
+				Nadelen:
+			</MudText>
+			<MudDivider />
+			<ul>
+				@foreach (var cons in ConsRMSE)
+				{
+					<li>
+						<MudText Typo="Typo.caption">@cons</MudText>
+					</li>
+				}
+			</ul>
+			
+			<MudDivider />
+			<MudText Typo="Typo.h6">MAPE: Mean Absolute Percentage Error</MudText>
+			<MudText Typo="Typo.caption">
+				@DescriptionMAPE
+			</MudText>
+			<MudText>Voordelen:</MudText>
+			<MudDivider />
+			<ul>
+				@foreach (var pros in ProsMAPE)
+				{
+					<li>
+						<MudText Typo="Typo.caption">@pros</MudText>
+					</li>
+				}
+			</ul>
+			<MudText>Nadelen:</MudText>
+			<MudDivider />
+			<ul>
+				@foreach (var cons in ConsMAPE)
+				{
+					<li>
+						<MudText Typo="Typo.caption">@cons</MudText>
+					</li>
+				}
+			</ul>
+		</MudCollapse>
+	</MudStack>
+</MudPaper>
+
+@code {
+	private bool PopOver = true;
+	public readonly string DescriptionRMSE = "Root Mean Square Error is een metriek waarbij het gemiddelde wordt berekent tussen de voorspelde waarde en de daadwerkelijke waarden. Het doel van deze metriek is om de nauwkeurigheid van regressie modellen te meten. Hoe lager de waarde, hoe nauwkeurig het model is.";
+	public readonly string DescriptionMAPE = "Mean Absolute Percentage Error is een metriek waarbij de percentage berekend wordt tussen het verschil van de voorspelde en daadwerkelijke waarde.";
+	public IEnumerable<string> ProsRMSE { get; set; } = [
+		"Intuitief te gebruiken",
+		"Standaard metriek binnen data science"
+	];
+	public IEnumerable<string> ProsMAPE { get; set; } = [
+		"Schaalonafhankelijk",
+		"Zeer intuitief te lezen"
+	];
+
+	public IEnumerable<string> ConsRMSE { get; set; } = [
+		"Gevoelig voor uitschieters",
+		"Gevoelig voor overfitting"
+	];
+	public IEnumerable<string> ConsMAPE { get; set; } = [
+		"Minder sterk als er met 0 waarden gewerkt worden."
+	];
+	private void OpenLegenda()
+	{
+		PopOver = !PopOver;
+	}
+}

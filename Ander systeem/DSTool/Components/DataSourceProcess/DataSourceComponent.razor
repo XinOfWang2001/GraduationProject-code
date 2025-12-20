@@ -1,0 +1,76 @@
+﻿@using Leap.ApplicationServices.DTO
+@using Leap.ApplicationServices.DTO.DataConfig
+@using Leap.ApplicationServices.DTO.DataProcessDTO
+@using LeapDataScienceTool.Common.Énums
+@using LeapDataScienceTool.Components.DataSourceProcess
+@using LeapDataScienceTool.PageManagers
+@inject IDialogService DialogService
+@inject IWorkspaceManager Manager
+
+<MudItem Class="rounded pa-2 flex-grow-1 justify-content-center mud-elevation" style="min-height:12em">
+	<div class="card m-1 mud-elevation-5">
+		<div class="card-body">
+			<h5 class="card-title">@Name</h5>
+			<MudButton Class="edit_color" OnClick="ChooseVariables">Selecteer</MudButton>
+		</div>
+	</div>
+</MudItem>
+@code {
+
+	[Parameter]
+	public required DataExtractConfigDTO? DataSourceConfig { get; set; }
+
+	[Parameter]
+	public Guid WorkspaceGuid { get; set; }
+
+	public string Name { get; set; } = "Selecteer databron";
+	private DataExtractProcess ExtractProcess { get; set; } = new();
+
+	protected override void OnInitialized()
+	{
+		// IF Existing config dto is inserted. It should do put requests.
+		if(DataSourceConfig != null)
+		{
+			ExtractProcess.Status = DataProcesState.SET;
+			ExtractProcess.DataProcess = DataSourceConfig;
+			Name = DataSourceConfig.ProjectDTO.HumanReadableName;
+		}
+		else
+		{
+			ExtractProcess.DataProcess = new DataExtractConfigDTO(){ WorkspaceId = WorkspaceGuid};
+		}
+		base.OnInitialized();
+	}
+
+	public async Task ChooseVariables()
+	{
+		DialogOptions dialogOptions = GetDialogOptions();
+		// Get Current content
+		DialogParameters<DataSourceDialog> parameters = GetDialogParameters(ExtractProcess.DataProcess);
+		IDialogReference result = await DialogService.ShowAsync<DataSourceDialog>("Databron configuratie", parameters, dialogOptions);
+		DataExtractConfigDTO? config = await result.GetReturnValueAsync<DataExtractConfigDTO>();
+
+		if (config != null)
+		{
+			DataSourceConfig = config;
+			Name = config.ProjectDTO.HumanReadableName;
+			// Refresh column data
+			// Callback to WorkspaceManager
+			await Manager.UpdateDataSourceConfig(DataSourceConfig);
+		}
+	}
+
+	private DialogOptions GetDialogOptions()
+	{
+		return new() { Position = DialogPosition.TopCenter, CloseButton = true, MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true, BackdropClick = false };
+	}
+
+	private DialogParameters<DataSourceDialog> GetDialogParameters(DataExtractConfigDTO config) 
+	{
+		return new DialogParameters<DataSourceDialog> 
+		{ 
+			{ extractInputClass => extractInputClass.DataExtractProcess, ExtractProcess }
+		};
+	}
+
+}

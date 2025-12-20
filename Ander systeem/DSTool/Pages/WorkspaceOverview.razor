@@ -1,0 +1,91 @@
+﻿@page "/workspace"
+@using Leap.ApplicationServices.DTO.DataProcessDTO
+@using Leap.ApplicationServices.DTO.Workspace
+@using Leap.ApplicationServices.Interfaces.ClientServerProxy
+@using LeapDataScienceTool.Components.Workspace
+@using Services;
+
+@inject IWorkspaceService workspaceService
+@inject IDialogService dialog 
+<MudGrid class="mb-2 mt=2">
+	<MudItem xs="6">
+		<MudText Typo="Typo.h3">Werkruimte overzicht</MudText>
+	</MudItem>
+</MudGrid>
+
+
+
+<MudGrid Class="mt-2">
+	<MudItem xs="9">
+		@if (HasLoadedIn)
+		{
+			<!---Loading component-->
+			@if (!IsSuccesfullyLoaded)
+			{
+				<MudItem xs="12" Class="mb-1">
+					<MudAlert Severity="Severity.Error">Er was iets misgegaan met het inladen van alle informatie. Probeer het op een later tijdstip. </MudAlert>
+				</MudItem>
+			}
+
+			@foreach (WorkspaceConfigDTO workspace in workspaces)
+			{
+				<WorkspaceListItem OnWorkspaceDeletion="OnDeletion" workspaceConfig="workspace"></WorkspaceListItem>
+			}
+		}
+		else
+		{
+			<MudItem xs="12">
+				<!--Load data in-->
+				<div class="spinner-border" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			</MudItem>
+		}
+	</MudItem>
+	<MudItem xs="3">
+		<MudPaper Class="mud-elevation-1 m-2 justify-content-center">
+			<MudText Typo="Typo.h4" Class="m-2">Actiemenu</MudText>
+			<MudButton StartIcon="@Icons.Material.Outlined.AddBox" class="add_color m-2" OnClick="OpenWorkshopCreator">Maak werkruimte</MudButton>
+		</MudPaper>
+	</MudItem>
+</MudGrid>
+
+@code {
+	public IEnumerable<WorkspaceConfigDTO> workspaces { get; set; } = [];
+	public bool HasLoadedIn { get; set; } = false;
+	public bool IsSuccesfullyLoaded { get; set; } = true;
+
+	protected override async Task OnInitializedAsync()
+	{
+		Console.WriteLine("Load async");
+		workspaces = await LoadWorkspaces();
+		IsSuccesfullyLoaded = workspaces.Any();
+		Console.WriteLine("Loading successful");
+		HasLoadedIn = true;
+	}
+
+	protected async virtual Task<IEnumerable<WorkspaceConfigDTO>> LoadWorkspaces()
+	{
+		try {
+			Console.WriteLine("Load async");
+			return await workspaceService.GetAllWorkspaces();
+		} catch{
+			return [];
+		}
+	}
+
+	protected async Task OnDeletion()
+	{
+		Console.WriteLine("Deleted succesfully");
+		await OnInitializedAsync();
+	}
+
+	public async Task OpenWorkshopCreator()
+	{
+		DialogParameters<WorkspaceCreationDialog> parameter = new()
+		{
+			{ x => x.workspaceConfig, new WorkspaceConfigDTO() }
+		};
+		var result = await dialog.ShowAsync<WorkspaceCreationDialog>("Maak pipeline aan.", parameter);
+	}
+}

@@ -1,0 +1,89 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSTool", "LeapDataScienceTool\DSTool.csproj", "{68486A66-AD0A-40EB-903C-3B1996E0C127}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSAPI", "LeapDataScienceAPI\DSAPI.csproj", "{7FC58890-001D-4D0D-AAED-EA2E1C37D702}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Leap.Backend", "Test.Leap.Backend\Test.Leap.Backend.csproj", "{36E83576-90A6-4AC7-937A-8975A2259358}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Domain", "Leap.Domain\Core.Domain.csproj", "{10376FB0-00D9-4E4C-9ADA-A67A0D9C44D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.ApplicationServices", "Leap.ApplicationServices\Core.ApplicationServices.csproj", "{ED60B159-ACB1-4CE9-9AE3-36CC341FC733}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Leap.UITest", "Test.Leap.UITest\Test.Leap.UITest.csproj", "{C716D3DB-78B6-43AC-BF66-5CE89A74C0AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Leap.Domain", "Test.Leap.Domain\Test.Leap.Domain.csproj", "{8CD6E401-A8C4-4CD4-8C52-F3D3DA31C8EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infra.Data", "Infra.Data\Infra.Data.csproj", "{A2389988-4C1B-482A-84A5-2C0331389107}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.ApplicationService", "Test.ApplicationService\Test.ApplicationService.csproj", "{244D8F4D-1723-452B-8405-D4F8E9A10685}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		test.runsettings.xml = test.runsettings.xml
+	EndProjectSection
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Leap.FastDSAPI", "Leap.FastDSAPI\Leap.FastDSAPI.pyproj", "{A761BC43-8CFF-464C-86D2-6E592A096AE4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Leap.DSAPI", "Test.Leap.DSAPI\Test.Leap.DSAPI.csproj", "{70EEA182-6A95-4446-BB91-80591AEAC5D6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{68486A66-AD0A-40EB-903C-3B1996E0C127}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68486A66-AD0A-40EB-903C-3B1996E0C127}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68486A66-AD0A-40EB-903C-3B1996E0C127}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68486A66-AD0A-40EB-903C-3B1996E0C127}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FC58890-001D-4D0D-AAED-EA2E1C37D702}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FC58890-001D-4D0D-AAED-EA2E1C37D702}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FC58890-001D-4D0D-AAED-EA2E1C37D702}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FC58890-001D-4D0D-AAED-EA2E1C37D702}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36E83576-90A6-4AC7-937A-8975A2259358}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36E83576-90A6-4AC7-937A-8975A2259358}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36E83576-90A6-4AC7-937A-8975A2259358}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36E83576-90A6-4AC7-937A-8975A2259358}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10376FB0-00D9-4E4C-9ADA-A67A0D9C44D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10376FB0-00D9-4E4C-9ADA-A67A0D9C44D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10376FB0-00D9-4E4C-9ADA-A67A0D9C44D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10376FB0-00D9-4E4C-9ADA-A67A0D9C44D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED60B159-ACB1-4CE9-9AE3-36CC341FC733}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED60B159-ACB1-4CE9-9AE3-36CC341FC733}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED60B159-ACB1-4CE9-9AE3-36CC341FC733}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED60B159-ACB1-4CE9-9AE3-36CC341FC733}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C716D3DB-78B6-43AC-BF66-5CE89A74C0AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C716D3DB-78B6-43AC-BF66-5CE89A74C0AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C716D3DB-78B6-43AC-BF66-5CE89A74C0AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C716D3DB-78B6-43AC-BF66-5CE89A74C0AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CD6E401-A8C4-4CD4-8C52-F3D3DA31C8EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CD6E401-A8C4-4CD4-8C52-F3D3DA31C8EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CD6E401-A8C4-4CD4-8C52-F3D3DA31C8EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CD6E401-A8C4-4CD4-8C52-F3D3DA31C8EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2389988-4C1B-482A-84A5-2C0331389107}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2389988-4C1B-482A-84A5-2C0331389107}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2389988-4C1B-482A-84A5-2C0331389107}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2389988-4C1B-482A-84A5-2C0331389107}.Release|Any CPU.Build.0 = Release|Any CPU
+		{244D8F4D-1723-452B-8405-D4F8E9A10685}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{244D8F4D-1723-452B-8405-D4F8E9A10685}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{244D8F4D-1723-452B-8405-D4F8E9A10685}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{244D8F4D-1723-452B-8405-D4F8E9A10685}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A761BC43-8CFF-464C-86D2-6E592A096AE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A761BC43-8CFF-464C-86D2-6E592A096AE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70EEA182-6A95-4446-BB91-80591AEAC5D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70EEA182-6A95-4446-BB91-80591AEAC5D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70EEA182-6A95-4446-BB91-80591AEAC5D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70EEA182-6A95-4446-BB91-80591AEAC5D6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {170BDE11-9037-4C5B-94FC-6304010C8842}
+	EndGlobalSection
+EndGlobal

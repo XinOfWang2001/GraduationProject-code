@@ -1,0 +1,159 @@
+// Typeahead:s
+
+// React BS Typeahead
+.rbt
+{
+  .rbt-input-main
+  {
+    @extend .icon-search;
+    background-position: right ($spacer * .75) top 50%;
+  }
+  &.has-aux
+  {
+    .rbt-input-main
+    {
+      background-image: none !important;
+    }
+  }
+  .rbt-aux
+  {
+    position: absolute;
+    top: $spacer * .5;
+    right: $spacer * .75;
+  }
+}
+
+// Twitter Typeahead.js
+.twitter-typeahead
+{
+  display: inline-block !important;
+  width: 100%;
+  .tt-hint
+  {
+    color: $text-muted !important;
+  }
+  // Dropdown
+  .tt-menu
+  {
+    @extend .dropdown-menu;
+    min-width: 100%;
+    > div
+    {
+      height: auto;
+      max-height: $dropdown-max-height;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    // item
+    div.tt-suggestion
+    {
+      @extend .dropdown-item;
+      .tt-highlight
+      {
+        text-transform: none !important;
+      }
+      // item hover
+      &.tt-cursor
+      {
+        cursor: pointer;
+        background-color: $dropdown-link-hover-bg !important;
+        color: $dropdown-link-hover-color !important;
+      }
+      &:hover
+      {
+        cursor: pointer;
+        background-color: $dropdown-link-hover-bg !important;
+        color: $dropdown-link-hover-color !important;
+      }
+    }
+  }
+}
+// If in navbar-search
+.navbar-search .twitter-typeahead
+{
+  .tt-menu
+  {
+    @include media-breakpoint-up(lg)
+    {
+      margin-top: $spacer * .5;
+    }
+    &:before,
+    &:after
+    {
+      left: 50%;
+      margin-left: -10px;
+    }
+  }
+}
+
+// Autocomplete (navbar-search sweco-contact)
+.autocomplete
+{
+  @extend .dropdown-menu;
+  position: absolute;
+  left: 0 !important;
+  z-index: $zindex-fixed-dropdown;
+  min-width: $dropdown-wrap-min-width;
+  width: 100% !important;
+  max-width: none;
+  &:before,
+  &:after
+  {
+    left: 50%;
+    margin-left: -10px;
+  }
+  &.open
+  {
+    display: block;
+    max-height: 480px;
+    overflow: visible !important;
+  }
+  &:empty,
+  &.open:empty
+  {
+    display: none;
+  }
+  > ul
+  {
+    display: block;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: inherit;
+    overflow-y: scroll !important;
+    li
+    {
+      @extend .dropdown-item;
+      @extend .clearfix;
+      white-space: normal;
+      &:hover, &:focus
+      {
+        cursor: pointer;
+      }
+      &.active
+      {
+        color: $dropdown-link-color;
+        background-color: $dropdown-link-hover-bg;
+        &:hover, &:focus
+        {
+          color: $dropdown-link-hover-color;
+          background-color: $dropdown-link-hover-bg;
+        }
+      }
+      span
+      {
+        white-space: normal;
+        + span,
+        &:last-child
+        {
+          float: right;
+        }
+      }
+      &.locked
+      {
+        cursor: inherit;
+        color: $disabled-color;
+      }
+    }
+  }
+}

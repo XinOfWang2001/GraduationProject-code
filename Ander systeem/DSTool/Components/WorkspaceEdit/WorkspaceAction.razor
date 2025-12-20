@@ -1,0 +1,39 @@
+﻿@using LeapDataScienceTool.PageManagers
+@using LeapDataScienceTool.Components.ModelTrainingComponent 
+@using LeapDataScienceTool.Components.ModelStorage
+
+@inject IDialogService DialogService
+
+<MudText Typo="Typo.h6" Class="mb-4 ps-6"><MudIcon Size="Size.Medium" Icon="@Icons.Material.Filled.Build"></MudIcon> Acties</MudText>
+<div class="d-flex align-content-end">
+	<span class="btn-group mb-4 ps-6">
+		<MudButton Class="action_color2 ms-1" OnClick="TriggerModelStorage">Model opslaan</MudButton>
+		<MudButton Class="action_color ms-1" OnClick="TriggerModelTraining">Train model</MudButton>
+	</span>
+</div>
+
+@code {
+	// P.S. Some form of validation should be performed to ensure the button is disabled when the configuration is incomplete.
+	public async Task TriggerModelStorage()
+	{
+		var DialogOptions = GetSmallDialogOptions();
+		var result = await DialogService.ShowAsync<ModelStorageDialog>("", DialogOptions);
+	}
+
+	public async Task TriggerModelTraining()
+	{
+		// Show confirm popup.
+		var DialogOptions = GetDialogOptions();
+		// Open trainingsresult popup.
+		await DialogService.ShowAsync<ModelTrainingResultDialog>("", DialogOptions);
+	}
+	private DialogOptions GetDialogOptions()
+	{
+		return new() { Position = DialogPosition.TopCenter, CloseButton = false, MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true, BackdropClick = false };
+	}
+
+	private DialogOptions GetSmallDialogOptions()
+	{
+		return new() { Position = DialogPosition.Center, CloseButton = false, MaxWidth = MaxWidth.Medium, BackdropClick = false };
+	}
+}

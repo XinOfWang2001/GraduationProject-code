@@ -1,0 +1,39 @@
+﻿@using LeapDataScienceTool.Common.Abstractions
+
+@typeparam T
+
+<MudSelect SelectAll="true" Label="@Label" Required="true" Class="ms-3 mt-2" SelectedValues=SelectedItems Clearable MultiSelection="true" SelectedValuesChanged="(IEnumerable<T> collection) => OnSelection(collection)">
+	@foreach (var element in Collection)
+	{
+		<MudSelectItem Value="@element">@element.ToString()</MudSelectItem>
+	}
+</MudSelect>
+
+@code {
+	[Parameter]
+	public EventCallback<IEnumerable<T>> CallbackMethod { get; set; }
+
+	[Parameter]
+	public IEnumerable<T> SelectedItems { get; set; } = [];
+
+	[Parameter]
+	public IEnumerable<T> Collection { get; set; } = [];
+
+	[Parameter]
+	public bool Required { get; set; } = false;
+
+	[Parameter]
+	public string Label { get; set; } = string.Empty;
+
+	public void PreProcessInput()
+	{
+		Console.WriteLine("Overridden preprocessing.");
+	}
+
+	protected void OnSelection(IEnumerable<T> input)
+	{
+		Console.WriteLine("Select multi values");
+		SelectedItems = input;
+		CallbackMethod.InvokeAsync(input);
+	}
+}

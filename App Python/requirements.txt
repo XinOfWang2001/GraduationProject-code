@@ -1,0 +1,14 @@
+pandas>=2.3.0
+numpy>=2.3.0
+polars>=1.31.0
+httpx>=0.28.1
+uvicorn
+gunicorn
+scikit-learn>=1.7.0
+pyarrow
+pylint>=1.0.0
+pytest
+fastapi[standard]
+pytest-cov
+python-dotenv
+azure-storage-blob
