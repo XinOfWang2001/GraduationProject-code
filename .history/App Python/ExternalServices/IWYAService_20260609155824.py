@@ -38,6 +38,7 @@ class APIService(AbstractExternalService):
         logging.info("Parse data collected")
         value = json_normalize(response)
         logging.debug("Start parsing values to datetime")
+        value.head(2)
         # Convert datetime string to datetime format
         value = self._convert_to_datetime(value)
         # Return dataframe

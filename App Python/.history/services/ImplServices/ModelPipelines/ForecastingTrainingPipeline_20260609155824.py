@@ -66,13 +66,12 @@ class ForecastingTrainingPipeline(ModelPipelineTemplate):
         # Create the pipeline object, in order to use it.
         model_pipeline = self.pipeline_builder.build_pipeline()
         target_strings = model_config.get_targets()
-        TARGET = df.select(target_strings)
         # Select target and features for model training
         FEATURES = df.select([TIMESTAMP] + self._input_features)
         # Split training, based to on DataSplitRatio value
         X_TRAIN, X_TEST, Y_TRAIN, Y_TEST = train_test_split(
             FEATURES,
-            TARGET,
+            df.select(target_strings),
             test_size=model_config.get_test_percentage(),
             shuffle=False,
         )

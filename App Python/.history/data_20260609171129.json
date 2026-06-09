@@ -1,0 +1,23 @@
+[
+  {
+    "timestamp": "2026-06-09T12:00:00Z",
+    "value": 22.5,
+    "sensor": "thermometer[$]",
+    "valuetype": "temperature",
+    "unit": "°C"
+  },
+  {
+    "timestamp": "2026-06-09T12:05:00Z",
+    "value": 45.0,
+    "sensor": "humidity_a",
+    "valuetype": "humidity",
+    "unit": "%"
+  },
+  {
+    "timestamp": "2026-06-09T12:10:00Z",
+    "value": 1013.2,
+    "sensor": "pressureSensor[$]",
+    "valuetype": "pressure",
+    "unit": "hPa"
+  }
+]

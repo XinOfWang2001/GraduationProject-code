@@ -3,7 +3,8 @@ import logging
 
 from Domain import DataRequest
 
-from services.AbstractServices import AbstractExternalService
+from .IWYAService import APIService
+
 
 class ExternalServiceFacade:
     """
@@ -15,9 +16,9 @@ class ExternalServiceFacade:
     """
 
     # Initialize external API services.
-    WEBAPI_api: AbstractExternalService
+    WEBAPI_api: APIService
 
-    def __init__(self, WEBAPI: AbstractExternalService):
+    def __init__(self, WEBAPI: APIService):
         self.WEBAPI_api = WEBAPI
 
     async def use_service(self, dto: DataRequest):
